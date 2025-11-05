@@ -92,7 +92,8 @@ Unlike generic tech consulting sites, Nafasi differentiates through:
 ┌─────────────────────────────────────────┐
 │          VERCEL (Frontend)              │
 │  Next.js 14 App Router + TypeScript     │
-│  Chakra UI + Tailwind CSS               │
+│  Chakra UI v3 (ONLY)                    │
+│  React Server Components + Particles    │
 │  TanStack Query + React Context         │
 └────────────┬────────────────────────────┘
              │
@@ -134,7 +135,14 @@ Unlike generic tech consulting sites, Nafasi differentiates through:
   - `/api/*` - Next.js API routes (AI chatbot, minimal proxy to Railway)
 - **Component Strategy**: Chakra UI ONLY for all components and styling (no Tailwind)
 - **Design Aesthetic**: Afrofuturism - cosmic theme, particle effects, deep blacks with luminous gradients
-- **Inspiration Sources**: exploding-star-nafasi-hero.png (hero visual), Parsec Computer (interaction patterns)
+- **Inspiration Sources**: nasa-star-burst-bw-hero.jpg (hero visual), Parsec Computer (interaction patterns)
+
+**React Server Components Best Practices** (✅ Implemented):
+- **Server by Default**: All components are Server Components unless they need client interactivity
+- **Isolated Client Components**: Only `ParticlesBackground.tsx` uses `'use client'` - contains all dynamic particle logic
+- **No Hydration Warnings**: Client components properly isolated, return `null` on server, render on client
+- **Global CSS for Animations**: Keyframe animations in `globals.css` instead of `styled-jsx` (eliminates client requirement)
+- **Benefits**: Better performance, smaller JS bundles, no `suppressHydrationWarning` hacks needed
 
 #### Backend (Railway)
 
@@ -237,33 +245,41 @@ Week 1        Week 4        Week 8        Week 12
 **Timeline**: NOW → Friday 9PM (3 days)
 **Goal**: Launch brand-focused landing page that establishes credibility
 
-#### Day 1 (Tuesday - Today)
+#### Day 1 (Tuesday) ✅ COMPLETED
 - [x] ~~Technical architecture planning~~ (DONE)
-- [ ] **Project Initialization** (2 hours)
-  - Initialize Next.js 14 project with TypeScript
-  - Configure Chakra UI only (no Tailwind to avoid conflicts)
-  - Set up ESLint, Prettier, Git
-  - Deploy skeleton to Vercel (continuous deployment)
-  - Install Three.js / particles.js for cosmic effects
+- [x] ~~**Project Initialization**~~ (DONE)
+  - ✅ Initialized Next.js 14 project with TypeScript
+  - ✅ Configured Chakra UI v3 ONLY (no Tailwind)
+  - ✅ Set up ESLint, Prettier, Git
+  - ✅ Deployed to Vercel (nafasi-website.vercel.app)
+  - ✅ Installed @tsparticles/react for cosmic effects
 
-- [ ] **Landing Page Design - Afrofuturism Aesthetic** (3 hours)
-  - Design cosmic hero with nebula/stardust effects (inspired by exploding-star-nafasi-hero.png)
-  - Plan segmented scroll sections (Parsec-inspired structure)
-  - Sketch 3 value proposition pillars with minimal text
-  - Design AI chatbot bubble interface
+- [x] ~~**Landing Page Design - Afrofuturism Aesthetic**~~ (DONE)
+  - ✅ Created comprehensive style guide (nafasi-website-style-guide.md)
+  - ✅ Documented Afrofuturism design philosophy
+  - ✅ Defined cosmic visual hierarchy with NASA star burst background
+  - ✅ Parsec Computer-inspired interaction patterns
 
-- [ ] **Hero Section Build** (3 hours)
-  - Cosmic hero with particle effects (deep blacks, luminous gradients)
-  - "Engineering Equity" headline (bold, futuristic typography)
-  - Compelling subtitle with space-themed animations
-  - Smooth scroll indicator to next section
+- [x] ~~**Hero Section Build**~~ (DONE)
+  - ✅ Cosmic hero with TSParticles (80 particles, green/blue/white colors)
+  - ✅ "Engineering Equity" headline (9xl on desktop, bold uppercase with green glow)
+  - ✅ Subtitle with NASA B&W star burst background (40% opacity)
+  - ✅ Dark vignette overlay for text readability (30% center to 50% edges)
+  - ✅ Smooth scroll indicator with bounce animation
+  - ✅ React Server Components architecture (ParticlesBackground isolated as client component)
+  - ✅ No hydration warnings (proper client/server separation)
 
-#### Day 2 (Wednesday)
+- [x] ~~**Value Props Section Build**~~ (DONE)
+  - ✅ "Why Nafasi?" section with 3-column grid
+  - ✅ Professional Grade, Human Centered, Forward Looking cards
+  - ✅ Hover effects (green glow, elevation, border brightness)
+  - ✅ Cosmic background texture (3% opacity) + green radial gradient
+
+#### Day 2 (Wednesday) - IN PROGRESS
 - [ ] **Core Sections Build** (6 hours)
-  - Value Propositions section (Professional Grade, Human Centered, Forward Looking)
-  - Services overview (3-4 key offerings)
-  - Mission statement / About Nafasi
-  - Social proof placeholder (testimonials ready for content)
+  - [ ] Services overview (3-4 key offerings)
+  - [ ] Mission statement / About Nafasi
+  - [ ] Social proof placeholder (testimonials ready for content)
 
 - [ ] **Polish & Animations** (2 hours)
   - Scroll animations (Framer Motion or Chakra animations)

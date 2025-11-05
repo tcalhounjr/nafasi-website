@@ -1,78 +1,9 @@
-'use client'
-
 import { Box, Heading, Text, Button, VStack, Container } from '@chakra-ui/react'
-import { useMemo, useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
-
-// Dynamically import Particles with no SSR
-const Particles = dynamic(() => import('@tsparticles/react'), {
-  ssr: false,
-})
+import ParticlesBackground from './ParticlesBackground'
 
 export default function Hero() {
-  const [isClient, setIsClient] = useState(false)
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  const particlesOptions = useMemo(
-    () => ({
-      background: {
-        color: {
-          value: '#0a0a0a',
-        },
-      },
-      fpsLimit: 120,
-      particles: {
-        color: {
-          value: ['#31b292', '#4dd4ae', '#1a4d7a', '#ffffff'],
-        },
-        links: {
-          color: '#31b292',
-          distance: 150,
-          enable: true,
-          opacity: 0.3,
-          width: 1,
-        },
-        move: {
-          enable: true,
-          speed: 1,
-          direction: 'none' as const,
-          random: true,
-          straight: false,
-          outModes: {
-            default: 'bounce' as const,
-          },
-        },
-        number: {
-          density: {
-            enable: true,
-          },
-          value: 80,
-        },
-        opacity: {
-          value: { min: 0.3, max: 0.8 },
-          animation: {
-            enable: true,
-            speed: 1,
-            sync: false,
-          },
-        },
-        shape: {
-          type: 'circle',
-        },
-        size: {
-          value: { min: 1, max: 3 },
-        },
-      },
-      detectRetina: true,
-    }),
-    []
-  )
-
   return (
-    <Box position="relative" minH="100vh" overflow="hidden" bg="nafasi.black" suppressHydrationWarning>
+    <Box position="relative" minH="100vh" overflow="hidden" bg="nafasi.black">
       {/* Hero Background Image */}
       <Box
         position="absolute"
@@ -102,14 +33,7 @@ export default function Hero() {
       />
 
       {/* Particles Background */}
-      {isClient && (
-        <Box position="absolute" top={0} left={0} w="100%" h="100%" zIndex={1} suppressHydrationWarning>
-          <Particles
-            id="tsparticles"
-            options={particlesOptions as any}
-          />
-        </Box>
-      )}
+      <ParticlesBackground />
 
       {/* Gradient Overlay inspired by exploding star */}
       <Box
@@ -218,41 +142,6 @@ export default function Hero() {
           </Box>
         </VStack>
       </Container>
-
-      {/* Keyframe Animations */}
-      <style jsx global>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes bounce {
-          0%,
-          100% {
-            transform: translateX(-50%) translateY(0);
-          }
-          50% {
-            transform: translateX(-50%) translateY(-10px);
-          }
-        }
-
-        @keyframes scrollIndicator {
-          0% {
-            transform: translateY(0);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(12px);
-            opacity: 0;
-          }
-        }
-      `}</style>
     </Box>
   )
 }
