@@ -1,9 +1,8 @@
 'use client'
 
 import { Box, Heading, Text, Button, VStack, Container } from '@chakra-ui/react'
-import { useCallback, useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import type { Engine } from '@tsparticles/engine'
 
 // Dynamically import Particles with no SSR
 const Particles = dynamic(() => import('@tsparticles/react'), {
@@ -15,11 +14,6 @@ export default function Hero() {
 
   useEffect(() => {
     setIsClient(true)
-  }, [])
-
-  const particlesInit = useCallback(async (engine: Engine) => {
-    const { loadSlim } = await import('@tsparticles/slim')
-    await loadSlim(engine)
   }, [])
 
   const particlesOptions = useMemo(
@@ -86,12 +80,14 @@ export default function Hero() {
         left={0}
         w="100%"
         h="100%"
-        bgImage="url('/nasa-star-burst-bw-hero.jpg')"
-        bgSize="cover"
-        bgPosition="center"
-        bgRepeat="no-repeat"
         opacity={0.4}
         zIndex={0}
+        style={{
+          backgroundImage: "url('/nasa-star-burst-bw-hero.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
       />
 
       {/* Dark Overlay for Better Text Readability - Adjusted for visible stars */}
@@ -110,7 +106,6 @@ export default function Hero() {
         <Box position="absolute" top={0} left={0} w="100%" h="100%" zIndex={1}>
           <Particles
             id="tsparticles"
-            init={particlesInit}
             options={particlesOptions as any}
           />
         </Box>
