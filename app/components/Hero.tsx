@@ -79,9 +79,35 @@ export default function Hero() {
 
   return (
     <Box position="relative" minH="100vh" overflow="hidden" bg="nafasi.black">
+      {/* Hero Background Image */}
+      <Box
+        position="absolute"
+        top={0}
+        left={0}
+        w="100%"
+        h="100%"
+        bgImage="url('/nasa-star-burst-bw-hero.jpg')"
+        bgSize="cover"
+        bgPosition="center"
+        bgRepeat="no-repeat"
+        opacity={0.4}
+        zIndex={0}
+      />
+
+      {/* Dark Overlay for Better Text Readability - Adjusted for visible stars */}
+      <Box
+        position="absolute"
+        top={0}
+        left={0}
+        w="100%"
+        h="100%"
+        bg="radial-gradient(circle at center, rgba(10, 10, 10, 0.3) 0%, rgba(10, 10, 10, 0.5) 100%)"
+        zIndex={0}
+      />
+
       {/* Particles Background */}
       {isClient && (
-        <Box position="absolute" top={0} left={0} w="100%" h="100%" zIndex={0}>
+        <Box position="absolute" top={0} left={0} w="100%" h="100%" zIndex={1}>
           <Particles
             id="tsparticles"
             init={particlesInit}
@@ -100,7 +126,7 @@ export default function Hero() {
         h="120%"
         bgGradient="radial(circle at center, rgba(49, 178, 146, 0.15), rgba(26, 77, 122, 0.1), transparent 70%)"
         filter="blur(60px)"
-        zIndex={1}
+        zIndex={2}
         pointerEvents="none"
       />
 
@@ -108,86 +134,43 @@ export default function Hero() {
       <Container
         maxW="container.xl"
         position="relative"
-        zIndex={2}
+        zIndex={3}
         display="flex"
         alignItems="center"
         justifyContent="center"
         minH="100vh"
+        px={{ base: 4, md: 8 }}
       >
-        <VStack gap={8} textAlign="center" maxW="4xl">
+        <VStack gap={{ base: 8, md: 10, lg: 12 }} textAlign="center" maxW="5xl">
           {/* Main Headline */}
           <Heading
             as="h1"
-            fontSize={{ base: '4xl', md: '6xl', lg: '8xl' }}
+            fontSize={{ base: '5xl', md: '7xl', lg: '9xl' }}
             fontWeight="black"
             letterSpacing="tight"
-            lineHeight="shorter"
-            bgGradient="linear(to-r, white, nafasi.greenLight)"
-            bgClip="text"
+            lineHeight={{ base: '1.1', md: '1', lg: '0.9' }}
+            color="white"
+            textTransform="uppercase"
             animation="fadeInUp 1s ease-out"
+            textShadow="0 0 40px rgba(49, 178, 146, 0.8), 0 4px 8px rgba(0, 0, 0, 0.8)"
+            mb={{ base: 4, md: 6 }}
           >
             Engineering Equity
           </Heading>
 
           {/* Subtitle */}
           <Text
-            fontSize={{ base: 'lg', md: 'xl', lg: '2xl' }}
+            fontSize={{ base: 'xl', md: '2xl', lg: '3xl' }}
             color="white"
             maxW="3xl"
             lineHeight="tall"
+            fontWeight="bold"
             animation="fadeInUp 1.2s ease-out"
+            px={{ base: 4, md: 0 }}
+            textShadow="0 2px 8px rgba(0, 0, 0, 0.9)"
           >
             Delivering AI-driven Technology Solutions for SMBs and Marginalized Communities
           </Text>
-
-          {/* Value Props Pills */}
-          <Box
-            display="flex"
-            gap={4}
-            flexWrap="wrap"
-            justifyContent="center"
-            animation="fadeInUp 1.4s ease-out"
-          >
-            <Box
-              px={4}
-              py={2}
-              borderRadius="full"
-              border="1px solid"
-              borderColor="nafasi.green"
-              bg="rgba(49, 178, 146, 0.1)"
-              color="nafasi.greenLight"
-              fontSize="sm"
-              fontWeight="semibold"
-            >
-              Professional Grade
-            </Box>
-            <Box
-              px={4}
-              py={2}
-              borderRadius="full"
-              border="1px solid"
-              borderColor="nafasi.green"
-              bg="rgba(49, 178, 146, 0.1)"
-              color="nafasi.greenLight"
-              fontSize="sm"
-              fontWeight="semibold"
-            >
-              Human Centered
-            </Box>
-            <Box
-              px={4}
-              py={2}
-              borderRadius="full"
-              border="1px solid"
-              borderColor="nafasi.green"
-              bg="rgba(49, 178, 146, 0.1)"
-              color="nafasi.greenLight"
-              fontSize="sm"
-              fontWeight="semibold"
-            >
-              Forward Looking
-            </Box>
-          </Box>
 
           {/* CTA Button */}
           <Button
