@@ -72,7 +72,7 @@ export default function Hero() {
   )
 
   return (
-    <Box position="relative" minH="100vh" overflow="hidden" bg="nafasi.black">
+    <Box position="relative" minH="100vh" overflow="hidden" bg="nafasi.black" suppressHydrationWarning>
       {/* Hero Background Image */}
       <Box
         position="absolute"
@@ -103,7 +103,7 @@ export default function Hero() {
 
       {/* Particles Background */}
       {isClient && (
-        <Box position="absolute" top={0} left={0} w="100%" h="100%" zIndex={1}>
+        <Box position="absolute" top={0} left={0} w="100%" h="100%" zIndex={1} suppressHydrationWarning>
           <Particles
             id="tsparticles"
             options={particlesOptions as any}
