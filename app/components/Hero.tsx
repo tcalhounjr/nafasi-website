@@ -1,13 +1,24 @@
 'use client'
 
 import { Box, Heading, Text, Button, VStack, Container } from '@chakra-ui/react'
-import { useCallback, useMemo } from 'react'
-import Particles from '@tsparticles/react'
-import { loadSlim } from '@tsparticles/slim'
+import { useCallback, useMemo, useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import type { Engine } from '@tsparticles/engine'
 
+// Dynamically import Particles with no SSR
+const Particles = dynamic(() => import('@tsparticles/react'), {
+  ssr: false,
+})
+
 export default function Hero() {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const particlesInit = useCallback(async (engine: Engine) => {
+    const { loadSlim } = await import('@tsparticles/slim')
     await loadSlim(engine)
   }, [])
 
@@ -69,13 +80,15 @@ export default function Hero() {
   return (
     <Box position="relative" minH="100vh" overflow="hidden" bg="nafasi.black">
       {/* Particles Background */}
-      <Box position="absolute" top={0} left={0} w="100%" h="100%" zIndex={0}>
-        <Particles
-          id="tsparticles"
-          init={particlesInit}
-          options={particlesOptions as any}
-        />
-      </Box>
+      {isClient && (
+        <Box position="absolute" top={0} left={0} w="100%" h="100%" zIndex={0}>
+          <Particles
+            id="tsparticles"
+            init={particlesInit}
+            options={particlesOptions as any}
+          />
+        </Box>
+      )}
 
       {/* Gradient Overlay inspired by exploding star */}
       <Box
