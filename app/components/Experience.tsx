@@ -115,11 +115,12 @@ export default function Experience() {
             />
 
             {/* Scrolling track */}
-            <Box
+            <div
+              className="experience-scrolling-track"
               style={{
                 display: 'flex',
                 gap: '3rem',
-                animation: 'scroll 40s linear infinite',
+                animation: 'experienceScroll 40s linear infinite',
                 willChange: 'transform',
               }}
               onMouseEnter={(e) => {
@@ -208,11 +209,22 @@ export default function Experience() {
                   />
                 </Box>
               ))}
-            </Box>
+            </div>
           </Box>
         </VStack>
       </Container>
 
+      {/* Animation keyframes */}
+      <style jsx global>{`
+        @keyframes experienceScroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+      `}</style>
     </Box>
   )
 }
