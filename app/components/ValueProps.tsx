@@ -1,3 +1,5 @@
+'use client'
+
 import { Box, Container, Heading, Text, SimpleGrid, VStack } from '@chakra-ui/react'
 
 interface ValuePropCardProps {

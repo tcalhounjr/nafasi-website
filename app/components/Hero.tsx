@@ -1,3 +1,5 @@
+'use client'
+
 import { Box, Heading, Text, Button, VStack, Container } from '@chakra-ui/react'
 import ParticlesBackground from './ParticlesBackground'
 

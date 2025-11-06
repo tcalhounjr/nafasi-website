@@ -385,6 +385,22 @@ filter: blur(60px)
 - Use `style` prop for `backgroundImage`, `backgroundSize`, `backgroundPosition`
 - Use Chakra props for layout: `position`, `w`, `h`, `opacity`, `zIndex`
 - Use `bgGradient` prop for gradients
+- **IMPORTANT:** All Chakra UI components must be client components (use `'use client'` directive)
+- Chakra's emotion CSS-in-JS requires client-side rendering to prevent hydration errors
+
+### CSS Animations in Next.js
+- `@keyframes` defined in `globals.css` are **NOT** accessible to inline `style` props
+- **Solution:** Define keyframes inline within the component using `<style jsx global>`
+- Example:
+  ```tsx
+  <style jsx global>{`
+    @keyframes myAnimation {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+  `}</style>
+  ```
+- Reference the animation in inline styles: `style={{ animation: 'myAnimation 40s linear infinite' }}`
 
 ### Next.js Optimization
 - Dynamic import for Particles with `ssr: false`
