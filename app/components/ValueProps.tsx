@@ -151,7 +151,7 @@ export default function ValueProps() {
               textShadow="0 2px 4px rgba(0, 0, 0, 0.8)"
             >
               We combine technical excellence with a commitment to equity, delivering solutions that
-              are as transformative as they are accessible.
+              are as empowering as they are transformative.
             </Text>
           </VStack>
 

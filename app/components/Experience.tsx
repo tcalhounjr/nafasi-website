@@ -75,7 +75,7 @@ export default function Experience() {
               lineHeight="tall"
               textShadow="0 2px 4px rgba(0, 0, 0, 0.8)"
             >
-              Partnering with leading organizations to deliver mission-critical technology solutions
+              Working with leading public and private organizations delivering holistic, mission-critical solutions. We specialize in connecting organizational strategy to the people, processes, and technology expected to execute it.
             </Text>
           </VStack>
 
