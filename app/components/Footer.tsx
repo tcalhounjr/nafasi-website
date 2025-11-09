@@ -6,9 +6,9 @@ const navigationLinks = [
   { name: 'Home', href: '#home' },
   { name: 'Why Nafasi', href: '#value-props' },
   { name: 'Experience', href: '#experience' },
-  { name: 'Solutions', href: '#solutions' },
   { name: 'Services', href: '#services' },
   { name: 'Technologies', href: '#technologies' },
+  { name: 'Solutions', href: '#solutions' },
 ]
 
 const socialLinks = [
