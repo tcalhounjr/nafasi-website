@@ -6,6 +6,7 @@ import Experience from './components/Experience'
 import Technologies from './components/Technologies'
 import Problems from './components/Problems'
 import Footer from './components/Footer'
+import Chatbot from './components/Chatbot'
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       <Technologies />
       <Problems />
       <Footer />
+      <Chatbot />
     </>
   )
 }
