@@ -14,9 +14,9 @@ export default function Home() {
       <Hero />
       <ValueProps />
       <Experience />
-      <Problems />
       <Services />
       <Technologies />
+      <Problems />
       <Footer />
     </>
   )
