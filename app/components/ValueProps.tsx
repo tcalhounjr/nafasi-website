@@ -92,6 +92,7 @@ export default function ValueProps() {
 
   return (
     <Box
+      id="value-props"
       as="section"
       position="relative"
       py={{ base: 20, md: 32 }}

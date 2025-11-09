@@ -58,6 +58,7 @@ export default function Problems() {
 
   return (
     <Box
+      id="solutions"
       as="section"
       position="relative"
       py={{ base: 20, md: 32 }}

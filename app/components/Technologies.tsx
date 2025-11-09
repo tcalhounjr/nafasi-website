@@ -33,6 +33,7 @@ export default function Technologies() {
 
   return (
     <Box
+      id="technologies"
       as="section"
       position="relative"
       py={{ base: 20, md: 32 }}
