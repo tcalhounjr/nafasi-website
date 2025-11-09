@@ -4,15 +4,15 @@ import { Box, Container, Heading, Text, VStack } from '@chakra-ui/react'
 
 export default function Experience() {
   const logos = [
-    { src: '/ARNG-large.png', alt: 'Army National Guard' },
-    { src: '/US_Air_Force_Logo_Solid_Colour.svg.png', alt: 'U.S. Air Force' },
-    { src: '/Seal_of_the_United_States_Department_of_the_Air_Force.svg.png', alt: 'Department of the Air Force' },
-    { src: '/Seal_of_the_U.S._Department_of_Veterans_Affairs.svg.png', alt: 'Department of Veterans Affairs' },
-    { src: '/dcmo-transparent.png', alt: 'Department of Defense Chief Management Officer' },
-    { src: '/Seal_of_the_United_States_Department_of_Homeland_Security.svg.png', alt: 'Department of Homeland Security' },
-    { src: '/Seal_of_the_United_States_Department_of_Justice.svg.png', alt: 'Department of Justice' },
-    { src: '/BLACKSTAR_Final-01.png', alt: 'Blackstar Diversified Enterprises' },
-    { src: '/cpc logo - transparent.png', alt: 'CPC' },
+    { src: '/experience/ARNG-large.png', alt: 'Army National Guard' },
+    { src: '/experience/US_Air_Force_Logo_Solid_Colour.svg.png', alt: 'U.S. Air Force' },
+    { src: '/experience/Seal_of_the_United_States_Department_of_the_Air_Force.svg.png', alt: 'Department of the Air Force' },
+    { src: '/experience/Seal_of_the_U.S._Department_of_Veterans_Affairs.svg.png', alt: 'Department of Veterans Affairs' },
+    { src: '/experience/dcmo-transparent.png', alt: 'Department of Defense Chief Management Officer' },
+    { src: '/experience/Seal_of_the_United_States_Department_of_Homeland_Security.svg.png', alt: 'Department of Homeland Security' },
+    { src: '/experience/Seal_of_the_United_States_Department_of_Justice.svg.png', alt: 'Department of Justice' },
+    { src: '/experience/BLACKSTAR_Final-01.png', alt: 'Blackstar Diversified Enterprises' },
+    { src: '/experience/cpc logo - transparent.png', alt: 'CPC' },
   ]
 
   return (
@@ -120,7 +120,7 @@ export default function Experience() {
               style={{
                 display: 'flex',
                 gap: '3rem',
-                animation: 'experienceScroll 40s linear infinite',
+                animation: 'experienceScroll 30s linear infinite',
                 willChange: 'transform',
               }}
               onMouseEnter={(e) => {
@@ -162,7 +162,7 @@ export default function Experience() {
                       width: 'auto',
                       height: 'auto',
                       objectFit: 'contain',
-                      filter: 'grayscale(100%) brightness(0.8)',
+                      filter: 'invert(1)',
                       transition: 'filter 0.3s ease',
                     }}
                     className="experience-logo-image"
@@ -202,7 +202,7 @@ export default function Experience() {
                       width: 'auto',
                       height: 'auto',
                       objectFit: 'contain',
-                      filter: 'grayscale(100%) brightness(0.8)',
+                      filter: 'invert(1)',
                       transition: 'filter 0.3s ease',
                     }}
                     className="experience-logo-image"
@@ -217,11 +217,11 @@ export default function Experience() {
       {/* Animation keyframes */}
       <style jsx global>{`
         @keyframes experienceScroll {
-          0% {
+          from {
             transform: translateX(0);
           }
-          100% {
-            transform: translateX(-50%);
+          to {
+            transform: translateX(calc(-180px * 9 - 3rem * 9));
           }
         }
       `}</style>
