@@ -2,13 +2,13 @@
 
 import { Box, Container, Heading, Text, SimpleGrid, VStack } from '@chakra-ui/react'
 
-interface ValuePropCardProps {
+interface ServiceCardProps {
   title: string
   description: string
   icon: string
 }
 
-function ValuePropCard({ title, description, icon }: ValuePropCardProps) {
+function ServiceCard({ title, description, icon }: ServiceCardProps) {
   return (
     <VStack
       gap={6}
@@ -68,31 +68,31 @@ function ValuePropCard({ title, description, icon }: ValuePropCardProps) {
   )
 }
 
-export default function ValueProps() {
-  const valueProps = [
+export default function Services() {
+  const services = [
     {
-      title: 'Professional Grade',
+      title: 'Business Process Improvement',
       description:
-        'Enterprise-quality technology solutions built with the same rigor and standards used by Fortune 500 companies, now accessible to businesses of all sizes.',
-      icon: '🏅',
+        'Technology only exists to enable existing processes. We start by documenting and improving said processes where possible, ensuring our solutions are oriented towards your desired future.',
+      icon: '⚙️',
     },
     {
-      title: 'Human Centered',
+      title: 'Web Application Development',
       description:
-        'Technology should empower people, not replace them. We design solutions that augment human capabilities and prioritize user experience at every touchpoint.',
-      icon: '🤝🏽',
+        'Our foundation is building custom web applications with modern frameworks and best practices, delivering responsive, scalable solutions that engage users and drive business growth.',
+      icon: '🌐',
     },
     {
-      title: 'Forward Thinking',
+      title: 'Mobile Application Development',
       description:
-        'Leveraging cutting-edge AI and emerging technologies to future-proof your business and create sustainable competitive advantages in rapidly evolving markets.',
-      icon: '🚀',
+        'Building on that web foundation, we develop cross-platform mobile applications, again leveraging the latest technologies to achieve your current and future business gaols.',
+      icon: '📱',
     },
   ]
 
   return (
     <Box
-      id="value-props"
+      id="services"
       as="section"
       position="relative"
       py={{ base: 20, md: 32 }}
@@ -143,7 +143,7 @@ export default function ValueProps() {
               letterSpacing="tight"
               textShadow="0 0 30px rgba(49, 178, 146, 0.6)"
             >
-              Why Nafasi?
+              Services We Provide
             </Heading>
             <Text
               fontSize={{ base: 'lg', md: 'xl' }}
@@ -151,23 +151,22 @@ export default function ValueProps() {
               lineHeight="tall"
               textShadow="0 2px 4px rgba(0, 0, 0, 0.8)"
             >
-              We combine technical excellence with a commitment to equity, delivering solutions that
-              are as empowering as they are transformative.
+              Comprehensive technology solutions designed to empower your business and accelerate growth through innovation and expertise.
             </Text>
           </VStack>
 
-          {/* Value Props Grid */}
+          {/* Services Grid */}
           <SimpleGrid
             columns={{ base: 1, md: 3 }}
             gap={{ base: 8, md: 8, lg: 10 }}
             w="100%"
           >
-            {valueProps.map((prop) => (
-              <ValuePropCard
-                key={prop.title}
-                title={prop.title}
-                description={prop.description}
-                icon={prop.icon}
+            {services.map((service) => (
+              <ServiceCard
+                key={service.title}
+                title={service.title}
+                description={service.description}
+                icon={service.icon}
               />
             ))}
           </SimpleGrid>

@@ -12,6 +12,13 @@ export const metadata: Metadata = {
   description: "Delivering AI-driven Technology Solutions for SMBs and Marginalized Communities",
   keywords: ["AI", "technology solutions", "SMB", "engineering equity", "software development"],
   authors: [{ name: "Nafasi" }],
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/footer/updated-nafasi-logo.png", type: "image/png" }
+    ],
+    apple: "/footer/updated-nafasi-logo.png",
+  },
   openGraph: {
     title: "Nafasi | Engineering Equity",
     description: "Delivering AI-driven Technology Solutions for SMBs and Marginalized Communities",

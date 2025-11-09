@@ -17,6 +17,7 @@ export default function Experience() {
 
   return (
     <Box
+      id="experience"
       as="section"
       position="relative"
       py={{ base: 20, md: 32 }}

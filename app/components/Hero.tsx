@@ -4,8 +4,15 @@ import { Box, Heading, Text, Button, VStack, Container } from '@chakra-ui/react'
 import ParticlesBackground from './ParticlesBackground'
 
 export default function Hero() {
+  const scrollToValueProps = () => {
+    const element = document.querySelector('#value-props')
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
-    <Box position="relative" minH="100vh" overflow="hidden" bg="nafasi.black">
+    <Box id="home" position="relative" minH="100vh" overflow="hidden" bg="nafasi.black">
       {/* Hero Background Image */}
       <Box
         position="absolute"
@@ -101,6 +108,7 @@ export default function Hero() {
             fontSize="xl"
             bg="nafasi.green"
             color="white"
+            onClick={scrollToValueProps}
             _hover={{
               bg: 'nafasi.greenLight',
               transform: 'translateY(-2px)',
