@@ -330,35 +330,260 @@ filter: blur(60px)
 
 ---
 
-## Future Section Guidelines
+## Navigation & Scrolling
+
+### Sticky Navigation Header
+**Implementation:**
+- Fixed position at top of viewport (position: fixed, top: 0, z-index: 1000)
+- Semi-transparent black background with backdrop blur for depth
+- Height: 60px (mobile), 70px (desktop)
+- Border bottom: 1px solid rgba(255, 255, 255, 0.2)
+
+**Desktop Navigation:**
+- Horizontal flex layout with 8-unit gap
+- Links: Medium font weight, gray-300 default color
+- Hover state: Nafasi green with animated underline expanding from 0% to 100% width
+- Underline: 2px height, positioned 4px below text
+- Transition: 0.3s ease for underline expansion, 0.2s for color
+
+**Mobile Navigation:**
+- Hamburger menu icon (24px × 24px SVG)
+- Slide-in drawer from right side (280px width)
+- Full-height panel with Nafasi black background
+- Close button (X icon) in top-right
+- Links stacked vertically with 6-unit gap, left-aligned
+- Backdrop overlay: rgba(0, 0, 0, 0.7) with click-to-close
+
+**Logo:**
+- Nafasi logo (updated-nafasi-logo.png)
+- Height: 40px (mobile), 50px (desktop)
+- Clickable, scrolls to #home section
+- Hover: scale(1.05) transform
+
+### Smooth Scroll Behavior
+**Implementation:**
+- JavaScript-based smooth scrolling (not CSS scroll-behavior)
+- Uses `element.scrollIntoView({ behavior: 'smooth', block: 'start' })`
+- Triggered on all navigation link clicks (preventDefault on anchor tags)
+- Mobile menu auto-closes after navigation selection
+
+**Section IDs:**
+- #home (Hero)
+- #value-props (Why Nafasi)
+- #experience (Experience)
+- #services (Services)
+- #technologies (Technologies)
+- #solutions (Problems/Solutions)
+
+**Page Flow Order:**
+1. Hero
+2. Value Props
+3. Experience
+4. Services
+5. Technologies
+6. Problems (Solutions)
+7. Footer
+
+---
+
+## Implemented Section Guidelines
 
 ### Value Propositions Section
-- **Layout:** 3-column grid (desktop), stack on mobile
-- **Icon Style:** Abstract, geometric shapes with green/blue gradients
-- **Background:** Subtle cosmic texture, lighter than hero
-- **Cards:** Dark background with green border on hover
+**Layout:**
+- 3-column grid (desktop), single column stack (mobile)
+- SimpleGrid with responsive columns: { base: 1, md: 3 }
+- Gap: 8-unit (mobile/tablet), 10-unit (desktop)
+
+**Cards:**
+- Background: rgba(255, 255, 255, 0.02) with subtle transparency
+- Border: 1px solid rgba(49, 178, 146, 0.2)
+- Border radius: lg
+- Padding: 8-unit (32px)
+- Hover state: Nafasi green border, lifted 4px (translateY), glow shadow
+
+**Icons:**
+- Emoji-based (🏅 Professional Grade, 🤝🏽 Human Centered, 🚀 Forward Thinking)
+- Circular background: rgba(49, 178, 146, 0.1)
+- Border: 2px solid Nafasi green
+- Size: 20-unit (80px) container
+- Font size: 4xl
+
+**Typography:**
+- Title: Uppercase, bold, xl-2xl responsive
+- Description: Stardust gray, md-lg responsive, tall line-height
 
 ### Services Section
-- **Layout:** Alternating left/right content-image layout
-- **Visual Style:** Screenshots with green glow overlay
-- **Emphasis:** Technology as accessible, not intimidating
+**Layout:**
+- 3-column grid (desktop), single column stack (mobile)
+- Same card structure as Value Props for consistency
+- Positioned after Experience, before Technologies
 
-### Mission/About Section
-- **Tone:** Human-centered, warm despite tech aesthetic
-- **Visual:** Team silhouettes with cosmic overlay
-- **Text:** Larger body text for emphasis on equity mission
+**Services Offered:**
+1. **Business Process Improvement** (⚙️)
+   - Focus: Documentation and process optimization before technology implementation
+2. **Web Application Development** (🌐)
+   - Foundation service using modern frameworks and best practices
+3. **Mobile Application Development** (📱)
+   - Cross-platform development building on web foundation
 
-### AI Chatbot
-- **Position:** Floating bottom-right
-- **Icon:** Cosmic bubble with pulsing green glow
-- **Interface:** Dark modal with green accents
-- **Personality:** Professional but approachable, emphasizes partnership
+**Visual Style:**
+- Cosmic background texture (same as Value Props)
+- Green accent radial gradient overlay
+- Consistent hover states and transitions
+
+### Experience Section
+**Implementation:**
+- Horizontal scrolling logo carousel
+- Displays past client/partner organizations
+- Automated scroll animation with pause on hover
+- Establishes credibility early in page flow
+
+### Technologies Section
+**Implementation:**
+- Animated logo carousel showcasing tech stack
+- Demonstrates technical capabilities and modern tooling
+- Positioned after Services to show "how we build"
+
+### Problems (Solutions) Section
+**Implementation:**
+- Video and carousel showcasing real-world solutions
+- Positioned near end of page flow to demonstrate impact
+- Links to case studies and success stories
 
 ### Footer
-- **Background:** Deepest black with particle texture
-- **Layout:** Multi-column (desktop), stacked (mobile)
-- **Links:** Stardust gray with green hover state
-- **Social Icons:** Simple, outlined, green on hover
+**Implementation:**
+- Black hole background image (black-hole-footer-half-light.jpg)
+- Background opacity: 0.4 for subtle cosmic aesthetic
+- Vignette overlay: radial-gradient from rgba(10, 10, 10, 0.5) to rgba(10, 10, 10, 0.7)
+- Height: 25vh (half of hero section's 50vh)
+
+**Layout:**
+- Two-column flex layout (desktop): Logo left, CTA center-right
+- Stacked layout (mobile): Logo top, CTA below
+- Logo vertical alignment: mt={{ base: 0, md: '-8px' }} to align with title center
+
+**CTA Section:**
+- Heading: "Let's Build Your Future" (3xl-5xl responsive)
+- Subtitle: Conversational text about partnership and equity
+- Button: "Start Your Journey" with Nafasi green, hover glow effect
+- Centered text alignment, flex: 1 for proper spacing
+
+**Navigation Links:**
+- Horizontal flex (desktop), vertical stack (mobile)
+- Matches main navigation order
+- Gray-400 default, Nafasi green hover
+- Includes all section links
+
+**Social Links:**
+- LinkedIn: https://www.linkedin.com/in/tcalhounjr
+- Twitter: https://www.twitter.com/tdcalhounjr
+- GitHub: https://www.github.com/tcalhounjr
+- Gray-500 default, Nafasi green hover
+- Smaller font size for subtle presence
+
+**Bottom Bar:**
+- Copyright notice with current year
+- Privacy Policy and Terms of Service links (placeholder)
+- 1px border-top with whiteAlpha.200
+
+---
+
+## AI Chatbot (Implementation Guide)
+
+### Technical Stack
+- **Backend:** OpenAI Assistant API
+- **SDK:** Vercel AI SDK for streaming and state management
+- **Database:** Supabase for conversation storage
+- **Spam Detection:** Integrated validation and rate limiting
+
+### UI Design
+**Position & Appearance:**
+- Floating bottom-right corner
+- Z-index: 1000 (same level as navigation)
+- Cosmic bubble icon with pulsing green glow animation
+- Distance from edges: 24px (mobile), 32px (desktop)
+
+**Chat Interface:**
+- Dark modal (Nafasi black background)
+- Backdrop: rgba(0, 0, 0, 0.8)
+- Width: 400px (desktop), 90vw (mobile)
+- Max height: 600px with scrollable message area
+- Border: 1px solid rgba(49, 178, 146, 0.3)
+- Box shadow: 0 8px 32px rgba(49, 178, 146, 0.2)
+
+**Message Bubbles:**
+- User messages: Right-aligned, Nafasi green background
+- AI messages: Left-aligned, rgba(255, 255, 255, 0.1) background
+- Border radius: lg
+- Padding: 12px 16px
+- Timestamp: Small gray text below each message
+
+**Input Field:**
+- Bottom-fixed within modal
+- Background: rgba(255, 255, 255, 0.05)
+- Border: 1px solid rgba(49, 178, 146, 0.3)
+- Focus state: Nafasi green border glow
+- Send button: Nafasi green with hover animation
+
+### Conversational Flow
+**Lead Qualification Sequence:**
+1. Greeting and introduction to Nafasi mission
+2. Ask for name
+3. Ask for email (with validation)
+4. Ask about project/business needs
+5. Ask about timeline and budget range
+6. Offer to schedule consultation or provide resources
+
+**Personality & Tone:**
+- Professional but warm and approachable
+- Emphasizes partnership and equity mission
+- Uses active voice and clear, jargon-free language
+- Reflects Nafasi brand values: Professional Grade, Human Centered, Forward Looking
+
+**AI Training Data:**
+- Nafasi services: Business Process Improvement, Web/Mobile Development
+- Core mission: "Engineering Equity" - democratizing professional-grade technology
+- Target audience: SMBs and marginalized communities
+- Value propositions: Professional grade, human-centered, forward-thinking
+
+### Data Management
+**Supabase Schema:**
+```sql
+conversations (
+  id: uuid PRIMARY KEY
+  created_at: timestamp
+  name: text
+  email: text
+  project_description: text
+  budget_range: text
+  timeline: text
+  messages: jsonb[]
+  is_qualified: boolean
+  spam_score: integer
+)
+```
+
+**Email Notifications:**
+- Trigger on qualified lead completion
+- Send to: hello@nafasi.io
+- Include: Name, email, project details, conversation transcript
+- Template: Professional with Nafasi branding
+
+### Spam Detection
+**Implementation:**
+- Rate limiting: Max 5 conversations per IP per hour
+- Email validation: RFC 5322 compliant regex
+- Keyword filtering: Flag common spam phrases
+- Honeypot field: Hidden field to catch bots
+- Time-based validation: Flag submissions faster than 10 seconds
+- Score threshold: >= 3 spam indicators = auto-reject
+
+**Spam Indicators:**
+- Invalid/temporary email domains
+- Excessive special characters in name
+- Suspicious URLs in messages
+- Rapid-fire message sending
+- Identical messages across sessions
 
 ---
 
