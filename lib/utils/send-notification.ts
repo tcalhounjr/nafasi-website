@@ -8,6 +8,8 @@ interface LeadData {
   projectDescription: string
   timeline: string
   budgetRange: string
+  country: string
+  timezone: string
   messages: Array<{ role: string; content: string; timestamp?: string }>
 }
 
@@ -164,6 +166,16 @@ function generateEmailHTML(leadData: LeadData): string {
         <div class="field-value">${leadData.budgetRange}</div>
       </div>
 
+      <div class="field">
+        <div class="field-label">Country</div>
+        <div class="field-value">${leadData.country}</div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Timezone</div>
+        <div class="field-value">${leadData.timezone}</div>
+      </div>
+
       <div class="transcript">
         <h3>Conversation Transcript</h3>
         ${messagesHTML}
@@ -186,8 +198,8 @@ export async function sendLeadNotification(leadData: LeadData): Promise<{
 }> {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Nafasi Chatbot <chatbot@nafasi.io>',
-      to: process.env.NOTIFICATION_EMAIL || 'hello@nafasi.io',
+      from: 'Nafasi Chatbot <chatbot@nafasi.co>',
+      to: process.env.NOTIFICATION_EMAIL || 'inquiries@nafasi.co',
       subject: `New Qualified Lead: ${leadData.name} from Nafasi Chatbot`,
       html: generateEmailHTML(leadData),
     })

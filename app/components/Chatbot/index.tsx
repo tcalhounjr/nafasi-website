@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react'
 import ChatButton from './ChatButton'
 import ChatModal from './ChatModal'
 import { useChatbot } from './useChatbot'
+import { useChatbotContext } from '../../contexts/ChatbotContext'
 
 export default function Chatbot() {
   const [mounted, setMounted] = useState(false)
+  const { isOpen, openChatbot, closeChatbot } = useChatbotContext()
   const {
     messages,
     input,
@@ -14,9 +16,8 @@ export default function Chatbot() {
     handleSubmit,
     isLoading,
     isTyping,
-    isOpen,
-    setIsOpen,
-  } = useChatbot()
+    handleClose: handleChatbotClose,
+  } = useChatbot(isOpen)
 
   // Only render on client side to avoid hydration mismatch
   useEffect(() => {
@@ -27,13 +28,18 @@ export default function Chatbot() {
     return null
   }
 
+  const handleClose = () => {
+    handleChatbotClose()
+    closeChatbot()
+  }
+
   return (
     <>
-      {!isOpen && <ChatButton onClick={() => setIsOpen(true)} />}
+      {!isOpen && <ChatButton onClick={openChatbot} />}
 
       <ChatModal
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={handleClose}
         messages={messages}
         input={input}
         handleInputChange={handleInputChange}

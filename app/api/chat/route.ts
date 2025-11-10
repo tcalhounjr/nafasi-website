@@ -232,6 +232,64 @@ export async function POST(req: Request) {
                 safeEnqueue(encoder.encode(`data: ${data}\n\n`))
               }
             }
+
+            // Handle function calls (lead qualification)
+            if (event.event === 'thread.run.requires_action') {
+              const requiredAction = event.data.required_action
+              if (requiredAction?.type === 'submit_tool_outputs') {
+                const toolCalls = requiredAction.submit_tool_outputs.tool_calls
+
+                for (const toolCall of toolCalls) {
+                  if (toolCall.type === 'function' && toolCall.function.name === 'submitLeadInformation') {
+                    try {
+                      const leadData = JSON.parse(toolCall.function.arguments)
+                      console.log('Lead qualification completed:', leadData)
+
+                      // Send lead-qualified event to frontend
+                      safeEnqueue(encoder.encode(`data: ${JSON.stringify({
+                        type: 'lead-qualified',
+                        leadData: leadData
+                      })}\n\n`))
+
+                      // Submit tool output to OpenAI and continue streaming
+                      // submitToolOutputsStream(threadId, runId, body)
+                      const submitStream = openai.beta.threads.runs.submitToolOutputsStream(
+                        currentThreadId,
+                        event.data.id,
+                        {
+                          tool_outputs: [{
+                            tool_call_id: toolCall.id,
+                            output: JSON.stringify({ success: true, message: 'Lead information received successfully' })
+                          }]
+                        }
+                      )
+
+                      console.log('Tool output submitted, continuing stream...')
+
+                      // Continue streaming the assistant's response after tool submission
+                      for await (const submitEvent of submitStream) {
+                        if (isClosed) break
+
+                        if (submitEvent.event === 'thread.message.delta') {
+                          const delta = submitEvent.data.delta
+                          if (delta.content && delta.content[0]?.type === 'text') {
+                            const text = delta.content[0].text?.value || ''
+                            fullResponse += text
+
+                            safeEnqueue(encoder.encode(`data: ${JSON.stringify({
+                              type: 'text-delta',
+                              textDelta: text,
+                            })}\n\n`))
+                          }
+                        }
+                      }
+                    } catch (parseError) {
+                      console.error('Error parsing lead data:', parseError)
+                    }
+                  }
+                }
+              }
+            }
           }
 
           // Save the complete assistant response

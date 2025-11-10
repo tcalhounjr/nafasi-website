@@ -48,6 +48,8 @@ export async function POST(req: Request) {
         project_description: leadData.projectDescription,
         timeline: leadData.timeline,
         budget_range: leadData.budgetRange,
+        country: leadData.country,
+        timezone: leadData.timezone,
         is_qualified: !spamCheck.isSpam,
         is_completed: true,
         spam_score: spamCheck.score,

@@ -1,6 +1,7 @@
 'use client'
 
 import { Box, Container, Flex, Heading, Text, Button, VStack, HStack, Link, Image } from '@chakra-ui/react'
+import { useChatbotContext } from '../contexts/ChatbotContext'
 
 const navigationLinks = [
   { name: 'Home', href: '#home' },
@@ -18,6 +19,8 @@ const socialLinks = [
 ]
 
 export default function Footer() {
+  const { openChatbot } = useChatbotContext()
+
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
     const element = document.querySelector(href)
@@ -106,6 +109,7 @@ export default function Footer() {
                 py={6}
                 fontSize="lg"
                 fontWeight="bold"
+                onClick={openChatbot}
                 _hover={{
                   bg: 'nafasi.lightGreen',
                   transform: 'translateY(-2px)',
