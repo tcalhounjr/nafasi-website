@@ -4,11 +4,11 @@ import { Box, Text } from '@chakra-ui/react'
 
 interface MessageBubbleProps {
   role: 'user' | 'assistant'
-  content: string
+  parts: Array<{ type: 'text'; text: string }>
   timestamp?: string
 }
 
-export default function MessageBubble({ role, content, timestamp }: MessageBubbleProps) {
+export default function MessageBubble({ role, parts, timestamp }: MessageBubbleProps) {
   const isUser = role === 'user'
 
   // Format timestamp
@@ -19,6 +19,18 @@ export default function MessageBubble({ role, content, timestamp }: MessageBubbl
     }
     const date = new Date(ts)
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+  }
+
+  // Extract text content from UIMessage parts
+  const getTextContent = () => {
+    return parts
+      .map((part) => {
+        if (part.type === 'text') {
+          return part.text
+        }
+        return ''
+      })
+      .join('')
   }
 
   return (
@@ -45,7 +57,7 @@ export default function MessageBubble({ role, content, timestamp }: MessageBubbl
         boxShadow={isUser ? '0 2px 8px rgba(49, 178, 146, 0.3)' : 'none'}
       >
         <Text fontSize="sm" lineHeight="tall" whiteSpace="pre-wrap">
-          {content}
+          {getTextContent()}
         </Text>
       </Box>
 

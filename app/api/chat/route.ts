@@ -1,4 +1,3 @@
-import { OpenAIStream, StreamingTextResponse } from 'ai'
 import OpenAI from 'openai'
 import { supabaseAdmin } from '@/lib/utils/supabase'
 import { checkForSpam, checkRateLimit } from '@/lib/utils/spam-detection'
@@ -10,7 +9,7 @@ const openai = new OpenAI({
 })
 
 // Helper to get client IP address
-function getClientIP(headersList: Headers): string {
+async function getClientIP(headersList: Headers): Promise<string> {
   // Try various headers that might contain the real IP
   const forwarded = headersList.get('x-forwarded-for')
   const realIP = headersList.get('x-real-ip')
@@ -93,11 +92,51 @@ async function saveMessage(
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { conversationId, threadId, message, metadata } = body
+    const { conversationId, threadId, messages: clientMessages, metadata } = body
+
+    console.log('Received body:', JSON.stringify(body, null, 2))
+
+    // Extract the last user message
+    // AI SDK v5 sends messages as an array with { text: string } format
+    const lastMessage = clientMessages && clientMessages.length > 0
+      ? clientMessages[clientMessages.length - 1]
+      : null
+
+    console.log('Last message:', JSON.stringify(lastMessage, null, 2))
+
+    let messageText = ''
+    if (lastMessage) {
+      if (typeof lastMessage === 'string') {
+        messageText = lastMessage
+      } else if (lastMessage.text) {
+        messageText = lastMessage.text
+      } else if (lastMessage.parts && Array.isArray(lastMessage.parts)) {
+        // AI SDK v5 uses parts array
+        messageText = lastMessage.parts
+          .filter((part: any) => part.type === 'text')
+          .map((part: any) => part.text)
+          .join('')
+      } else if (lastMessage.content) {
+        messageText = typeof lastMessage.content === 'string'
+          ? lastMessage.content
+          : Array.isArray(lastMessage.content)
+          ? lastMessage.content.map((part: any) => part.type === 'text' ? part.text : '').join('')
+          : ''
+      }
+    }
+
+    console.log('Extracted message text:', messageText)
+
+    if (!messageText) {
+      return new Response(
+        JSON.stringify({ error: 'No message provided' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
 
     // Get client IP
-    const headersList = headers()
-    const ipAddress = metadata?.ipAddress || getClientIP(headersList)
+    const headersList = await headers()
+    const ipAddress = metadata?.ipAddress || await getClientIP(headersList)
 
     // Rate limiting check
     const isRateLimited = await checkRateLimit(ipAddress, supabaseAdmin)
@@ -112,7 +151,7 @@ export async function POST(req: Request) {
 
     // Spam detection on user message
     const spamCheck = checkForSpam({
-      messages: [{ content: message }],
+      messages: [{ content: messageText }],
       ipAddress,
     })
 
@@ -138,7 +177,7 @@ export async function POST(req: Request) {
     const currentConversationId = await saveMessage(
       conversationId,
       currentThreadId,
-      message,
+      messageText,
       'user',
       { ipAddress, userAgent: metadata?.userAgent }
     )
@@ -146,31 +185,91 @@ export async function POST(req: Request) {
     // Add user message to OpenAI thread
     await openai.beta.threads.messages.create(currentThreadId, {
       role: 'user',
-      content: message,
+      content: messageText,
     })
 
-    // Create a run with the assistant
+    // Create a run with the assistant and stream the response
     const run = await openai.beta.threads.runs.create(currentThreadId, {
       assistant_id: process.env.OPENAI_ASSISTANT_ID!,
       stream: true,
     })
 
-    // Convert the response into a friendly text-stream
-    const stream = OpenAIStream(run, {
-      async onFinal(completion) {
-        // Save assistant response to Supabase
-        await saveMessage(
-          currentConversationId,
-          currentThreadId,
-          completion,
-          'assistant'
-        )
+    // Create a streaming response
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder()
+        let fullResponse = ''
+        let isClosed = false
+
+        // Helper to safely enqueue data
+        const safeEnqueue = (data: Uint8Array) => {
+          if (!isClosed) {
+            try {
+              controller.enqueue(data)
+            } catch (error) {
+              console.error('Enqueue error:', error)
+              isClosed = true
+            }
+          }
+        }
+
+        try {
+          for await (const event of run) {
+            if (isClosed) break
+
+            // Handle different event types
+            if (event.event === 'thread.message.delta') {
+              const delta = event.data.delta
+              if (delta.content && delta.content[0]?.type === 'text') {
+                const text = delta.content[0].text?.value || ''
+                fullResponse += text
+
+                // Send SSE formatted data
+                const data = JSON.stringify({
+                  type: 'text-delta',
+                  textDelta: text,
+                })
+                safeEnqueue(encoder.encode(`data: ${data}\n\n`))
+              }
+            }
+          }
+
+          // Save the complete assistant response
+          if (fullResponse) {
+            await saveMessage(
+              currentConversationId,
+              currentThreadId,
+              fullResponse,
+              'assistant'
+            )
+          }
+
+          // Send finish event
+          if (!isClosed) {
+            safeEnqueue(encoder.encode(`data: ${JSON.stringify({ type: 'finish' })}\n\n`))
+            controller.close()
+            isClosed = true
+          }
+        } catch (error) {
+          console.error('Streaming error:', error)
+          if (!isClosed) {
+            try {
+              controller.error(error)
+            } catch (e) {
+              console.error('Error closing controller:', e)
+            }
+            isClosed = true
+          }
+        }
       },
     })
 
     // Return streaming response with conversation metadata in headers
-    return new StreamingTextResponse(stream, {
+    return new Response(stream, {
       headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
         'X-Conversation-Id': currentConversationId,
         'X-Thread-Id': currentThreadId,
       },

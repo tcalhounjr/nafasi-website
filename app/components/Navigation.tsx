@@ -1,8 +1,7 @@
 'use client'
 
-import { Box, Container, Flex, Link, Image, IconButton, VStack } from '@chakra-ui/react'
-import { Drawer } from '@chakra-ui/react'
-import { useState } from 'react'
+import { Box, Container, Flex, Link, Image, VStack } from '@chakra-ui/react'
+import { useState, useEffect } from 'react'
 
 const navigationLinks = [
   { name: 'Home', href: '#home' },
@@ -15,8 +14,14 @@ const navigationLinks = [
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const onOpen = () => setIsOpen(true)
   const onClose = () => setIsOpen(false)
+
+  // Only render on client side to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
@@ -113,8 +118,8 @@ export default function Navigation() {
         </Flex>
       </Container>
 
-      {/* Mobile Menu Overlay */}
-      {isOpen && (
+      {/* Mobile Menu Overlay - Only render on client */}
+      {mounted && isOpen && (
         <>
           {/* Backdrop */}
           <Box

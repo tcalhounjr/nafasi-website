@@ -19,14 +19,14 @@ export default function ChatInput({
   placeholder = 'Type your message...',
 }: ChatInputProps) {
   return (
-    <Box
-      as="form"
+    <form
       onSubmit={onSubmit}
-      position="relative"
-      p={3}
-      borderTop="1px solid"
-      borderColor="rgba(49, 178, 146, 0.3)"
-      bg="rgba(255, 255, 255, 0.05)"
+      style={{
+        position: 'relative',
+        padding: '12px',
+        borderTop: '1px solid rgba(49, 178, 146, 0.3)',
+        background: 'rgba(255, 255, 255, 0.05)',
+      }}
     >
       <Input
         value={value}
@@ -56,21 +56,6 @@ export default function ChatInput({
       <IconButton
         type="submit"
         aria-label="Send message"
-        icon={
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
-        }
         position="absolute"
         right="20px"
         top="50%"
@@ -81,7 +66,7 @@ export default function ChatInput({
         borderRadius="full"
         bg="nafasi.green"
         color="white"
-        isDisabled={isLoading || !value.trim()}
+        disabled={isLoading || !value.trim()}
         _hover={{
           bg: 'nafasi.lightGreen',
           transform: 'translateY(-50%) scale(1.05)',
@@ -100,7 +85,21 @@ export default function ChatInput({
           },
         }}
         transition="all 0.2s"
-      />
-    </Box>
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </IconButton>
+    </form>
   )
 }

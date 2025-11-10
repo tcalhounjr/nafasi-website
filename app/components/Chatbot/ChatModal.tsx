@@ -6,10 +6,16 @@ import MessageBubble from './MessageBubble'
 import TypingIndicator from './TypingIndicator'
 import ChatInput from './ChatInput'
 
+interface Message {
+  id: string
+  role: 'user' | 'assistant'
+  parts: Array<{ type: 'text'; text: string }>
+}
+
 interface ChatModalProps {
   isOpen: boolean
   onClose: () => void
-  messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>
+  messages: Message[]
   input: string
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
@@ -90,21 +96,6 @@ export default function ChatModal({
 
           <IconButton
             aria-label="Close chat"
-            icon={
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            }
             onClick={onClose}
             variant="ghost"
             size="sm"
@@ -113,7 +104,21 @@ export default function ChatModal({
               bg: 'rgba(255, 255, 255, 0.1)',
               color: 'nafasi.green',
             }}
-          />
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </IconButton>
         </Flex>
 
         {/* Messages Area */}
@@ -150,7 +155,7 @@ export default function ChatModal({
             <MessageBubble
               key={message.id}
               role={message.role}
-              content={message.content}
+              parts={message.parts}
             />
           ))}
 
