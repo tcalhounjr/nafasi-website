@@ -42,7 +42,7 @@ async function saveMessage(
   try {
     if (!conversationId) {
       // Create new conversation
-      const { data, error } = await supabaseAdmin()
+      const { data, error } = await (supabaseAdmin() as any)
         .from('conversations')
         .insert({
           thread_id: threadId,
@@ -63,7 +63,7 @@ async function saveMessage(
       return data.id
     } else {
       // Append to existing conversation
-      const { data: existing } = await supabaseAdmin()
+      const { data: existing } = await (supabaseAdmin() as any)
         .from('conversations')
         .select('messages')
         .eq('id', conversationId)
@@ -76,7 +76,7 @@ async function saveMessage(
         timestamp: new Date().toISOString(),
       })
 
-      await supabaseAdmin()
+      await (supabaseAdmin() as any)
         .from('conversations')
         .update({ messages, thread_id: threadId })
         .eq('id', conversationId)
