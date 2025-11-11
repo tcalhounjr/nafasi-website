@@ -30,7 +30,8 @@ export async function POST(req: Request) {
       )
     }
 
-    const conversation = data
+    // Type assertion needed because Supabase types don't narrow properly
+    const conversation = data as any
 
     // Comprehensive spam check on lead data
     const spamCheck = checkForSpam({
