@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     }
 
     // Get conversation from database
-    const { data: conversation, error: fetchError } = await supabaseAdmin
+    const { data: conversation, error: fetchError } = await supabaseAdmin()
       .from('conversations')
       .select('*')
       .eq('id', conversationId)
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     })
 
     // Update conversation with lead data and spam score
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await supabaseAdmin()
       .from('conversations')
       .update({
         name: leadData.name,
