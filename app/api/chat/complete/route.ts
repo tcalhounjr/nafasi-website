@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     })
 
     // Update conversation with lead data and spam score
-    const { error: updateError } = await supabaseAdmin()
+    const { error: updateError } = await (supabaseAdmin() as any)
       .from('conversations')
       .update({
         name: leadData.name,
