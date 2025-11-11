@@ -22,7 +22,15 @@ export async function POST(req: Request) {
       .eq('id', conversationId)
       .single()
 
-    if (fetchError || !conversation) {
+    if (fetchError) {
+      console.error('Error fetching conversation:', fetchError)
+      return new Response(
+        JSON.stringify({ error: 'Conversation not found' }),
+        { status: 404, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+
+    if (!conversation) {
       return new Response(
         JSON.stringify({ error: 'Conversation not found' }),
         { status: 404, headers: { 'Content-Type': 'application/json' } }
