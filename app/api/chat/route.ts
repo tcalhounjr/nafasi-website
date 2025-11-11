@@ -263,9 +263,9 @@ export async function POST(req: Request) {
 
                       // Submit tool output to OpenAI and continue streaming
                       const submitStream = openai.beta.threads.runs.submitToolOutputsStream(
-                        currentThreadId,
                         event.data.id,
                         {
+                          thread_id: currentThreadId,
                           tool_outputs: [{
                             tool_call_id: toolCall.id,
                             output: JSON.stringify({ success: true, message: 'Lead information received successfully' })
