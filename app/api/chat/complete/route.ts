@@ -16,13 +16,13 @@ export async function POST(req: Request) {
     }
 
     // Get conversation from database
-    const { data: conversation, error: fetchError } = await supabaseAdmin()
+    const { data, error: fetchError } = await supabaseAdmin()
       .from('conversations')
       .select('*')
       .eq('id', conversationId)
       .single()
 
-    if (fetchError) {
+    if (fetchError || !data) {
       console.error('Error fetching conversation:', fetchError)
       return new Response(
         JSON.stringify({ error: 'Conversation not found' }),
@@ -30,12 +30,7 @@ export async function POST(req: Request) {
       )
     }
 
-    if (!conversation) {
-      return new Response(
-        JSON.stringify({ error: 'Conversation not found' }),
-        { status: 404, headers: { 'Content-Type': 'application/json' } }
-      )
-    }
+    const conversation = data
 
     // Comprehensive spam check on lead data
     const spamCheck = checkForSpam({
