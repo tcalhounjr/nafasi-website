@@ -6,10 +6,12 @@ import Experience from './components/Experience'
 import Technologies from './components/Technologies'
 import Problems from './components/Problems'
 import Footer from './components/Footer'
+import Chatbot from './components/Chatbot'
+import { ChatbotProvider } from './contexts/ChatbotContext'
 
 export default function Home() {
   return (
-    <>
+    <ChatbotProvider>
       <Navigation />
       <Hero />
       <ValueProps />
@@ -18,6 +20,7 @@ export default function Home() {
       <Technologies />
       <Problems />
       <Footer />
-    </>
+      <Chatbot />
+    </ChatbotProvider>
   )
 }

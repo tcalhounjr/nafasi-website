@@ -2,8 +2,11 @@
 
 import { Box, Heading, Text, Button, VStack, Container } from '@chakra-ui/react'
 import ParticlesBackground from './ParticlesBackground'
+import { useChatbotContext } from '../contexts/ChatbotContext'
 
 export default function Hero() {
+  const { openChatbot } = useChatbotContext()
+
   const scrollToValueProps = () => {
     const element = document.querySelector('#value-props')
     if (element) {
@@ -108,7 +111,7 @@ export default function Hero() {
             fontSize="xl"
             bg="nafasi.green"
             color="white"
-            onClick={scrollToValueProps}
+            onClick={openChatbot}
             _hover={{
               bg: 'nafasi.greenLight',
               transform: 'translateY(-2px)',
