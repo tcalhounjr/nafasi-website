@@ -1,6 +1,13 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let _resend: Resend | null = null
+
+function getResendClient() {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  return _resend
+}
 
 interface LeadData {
   name: string
@@ -197,6 +204,7 @@ export async function sendLeadNotification(leadData: LeadData): Promise<{
   error?: any
 }> {
   try {
+    const resend = getResendClient()
     const { data, error } = await resend.emails.send({
       from: 'Nafasi Chatbot <chatbot@nafasi.co>',
       to: process.env.NOTIFICATION_EMAIL || 'inquiries@nafasi.co',

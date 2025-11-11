@@ -3,10 +3,17 @@ import { supabaseAdmin } from '@/lib/utils/supabase'
 import { checkForSpam, checkRateLimit } from '@/lib/utils/spam-detection'
 import { headers } from 'next/headers'
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Lazy initialization for OpenAI client
+let _openai: OpenAI | null = null
+
+function getOpenAIClient() {
+  if (!_openai) {
+    _openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  }
+  return _openai
+}
 
 // Helper to get client IP address
 async function getClientIP(headersList: Headers): Promise<string> {
@@ -165,6 +172,9 @@ export async function POST(req: Request) {
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
     }
+
+    // Get OpenAI client
+    const openai = getOpenAIClient()
 
     // Create or retrieve OpenAI thread
     let currentThreadId = threadId
