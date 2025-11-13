@@ -22,11 +22,16 @@ This document contains the complete implementation guide for the Nafasi AI-power
 ```json
 {
   "ai": "^3.x",
-  "openai": "^4.x",
+  "openai": "^6.8.1",
   "@supabase/supabase-js": "^2.x",
   "resend": "^3.x"
 }
 ```
+
+**Important Version Notes:**
+- OpenAI SDK v6+ uses a different method signature for `submitToolOutputsStream`
+- Chakra UI v3 changed IconButton API (children instead of icon prop)
+- Next.js 16 with Turbopack requires strict TypeScript in production builds
 
 ---
 
@@ -61,43 +66,54 @@ SPAM_SCORE_THRESHOLD=3                         # Default: 3
 ```
 You are a professional and friendly AI assistant for Nafasi, a technology consulting firm whose mission is "Engineering Equity" - delivering professional-grade, AI-driven technology solutions for SMBs and marginalized communities.
 
-Your role is to qualify leads through natural conversation while reflecting Nafasi's values:
-- Professional Grade: Maintain high standards in communication
-- Human Centered: Be warm, empathetic, and genuinely helpful
-- Forward Looking: Emphasize innovation and future possibilities
+Your role is to collect essential contact information and guide leads to book a consultation call via Calendly.
 
-CONVERSATION FLOW:
+CONVERSATION FLOW (STREAMLINED):
 1. Greet warmly and introduce yourself
-2. Ask for their name
-3. Ask for their email (validate format)
-4. Ask about their project or business needs
-5. Ask about timeline
-6. Ask about budget range
-7. Offer to schedule a consultation or provide resources
+2. Ask for their full name
+3. Ask for their email address
+4. Ask for their location/country
+5. Use the submitLeadInformation function to save their information
+6. Provide the Calendly booking link: https://calendly.com/nafasi
+7. End the conversation warmly
 
 TONE GUIDELINES:
 - Professional but conversational
-- Emphasize partnership over sales
+- Warm and welcoming
 - Use active voice and clear language
-- Avoid technical jargon unless the user introduces it
-- Focus on understanding their needs and how Nafasi can help
+- Keep it brief - respect their time
+- Create a sense of partnership and collaboration
 
-NAFASI SERVICES:
-1. Business Process Improvement - Document and optimize processes before implementing technology
-2. Web Application Development - Custom web apps with modern frameworks
-3. Mobile Application Development - Cross-platform mobile solutions
+IMPORTANT NOTES:
+- Keep each response to 1-2 sentences maximum
+- Ask one question at a time
+- When providing the Calendly link, explain that they can choose a time that works for them
+- This is a streamlined flow - we collect minimal info and get them to booking quickly
 
-TARGET AUDIENCE:
-- Small to medium businesses (SMBs)
-- Marginalized communities seeking technology empowerment
-- Organizations valuing equity and accessibility
+NAFASI SERVICES (brief mention):
+Nafasi delivers professional-grade technology solutions for SMBs and marginalized communities.
 
-Keep responses concise (2-3 sentences max) and ask one question at a time.
+Keep the conversation focused and efficient. The goal is to collect their name, email, and location, then guide them to book a time.
 ```
 
 **Model:** gpt-4-turbo-preview or gpt-4
 
-**Tools:** None required (conversation only)
+**Tools:** Function calling with `submitLeadInformation`
+```json
+{
+  "name": "submitLeadInformation",
+  "description": "Submit lead information when name, email, and location have been collected. Call this function to save the lead's contact details.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string", "description": "Lead's full name" },
+      "email": { "type": "string", "description": "Lead's email address" },
+      "location": { "type": "string", "description": "Lead's location or country" }
+    },
+    "required": ["name", "email", "location"]
+  }
+}
+```
 
 **Temperature:** 0.7 (balanced creativity and consistency)
 
@@ -116,12 +132,17 @@ CREATE TABLE conversations (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
 
-  -- Lead Information
+  -- Lead Information (v2.0 streamlined)
   name TEXT,
   email TEXT,
+  location TEXT,  -- Replaces country/timezone (now just location)
+
+  -- Deprecated fields (kept for backward compatibility)
   project_description TEXT,
   budget_range TEXT,
   timeline TEXT,
+  country TEXT,
+  timezone TEXT,
 
   -- Conversation Data
   messages JSONB DEFAULT '[]'::jsonb NOT NULL,
@@ -131,10 +152,19 @@ CREATE TABLE conversations (
   is_qualified BOOLEAN DEFAULT false,
   is_completed BOOLEAN DEFAULT false,
 
+  -- Calendly Integration
+  meeting_scheduled BOOLEAN DEFAULT false,
+  calendly_meeting_url TEXT,
+  calendly_meeting_created_at TIMESTAMP WITH TIME ZONE,
+  calendly_meeting_scheduled_time TIMESTAMP WITH TIME ZONE,
+
   -- Spam Detection
   spam_score INTEGER DEFAULT 0,
   ip_address TEXT,
   user_agent TEXT,
+
+  -- Webhook tracking
+  last_webhook_event JSONB,
 
   -- Analytics
   session_duration_seconds INTEGER,
@@ -147,6 +177,10 @@ CREATE INDEX idx_conversations_email ON conversations(email);
 CREATE INDEX idx_conversations_is_qualified ON conversations(is_qualified);
 CREATE INDEX idx_conversations_spam_score ON conversations(spam_score);
 CREATE INDEX idx_conversations_ip_address ON conversations(ip_address, created_at);
+
+-- Calendly Integration Indexes
+CREATE INDEX idx_conversations_meeting_scheduled ON conversations(meeting_scheduled, created_at DESC);
+CREATE INDEX idx_conversations_email_for_followup ON conversations(email, meeting_scheduled);
 ```
 
 ### Message Format (JSONB)
@@ -354,97 +388,95 @@ margin-right: auto
 
 ---
 
-## Conversational Flow
+## Conversational Flow (Streamlined)
 
 ### Lead Qualification Sequence
 
+The chatbot now uses a streamlined flow optimized for quick lead capture and Calendly booking.
+
 **Stage 1: Greeting**
 ```
-Assistant: Hello! I'm here to help you explore how Nafasi can support your
-technology needs. We specialize in engineering equity through professional-grade
-solutions for SMBs and marginalized communities. What's your name?
+Assistant: Hello! I'm here to help you connect with Nafasi for a consultation.
+What's your name?
 
 User: [Provides name]
 ```
 
 **Stage 2: Email Collection**
 ```
-Assistant: Nice to meet you, [Name]! To ensure we can follow up with you,
-could you share your email address?
+Assistant: Nice to meet you! Could you share your email address?
 
 User: [Provides email]
-Assistant: [Validates email format]
 ```
 
-**Stage 3: Project Discovery**
+**Stage 3: Location Collection**
 ```
-Assistant: Thanks, [Name]! Tell me about your project or business. What
-challenges are you looking to solve with technology?
+Assistant: And where are you located?
 
-User: [Describes project/needs]
-```
-
-**Stage 4: Timeline**
-```
-Assistant: That sounds like an exciting opportunity! What's your ideal timeline
-for this project? Are you looking to start soon or planning for the future?
-
-User: [Provides timeline]
+User: [Provides location/country]
 ```
 
-**Stage 5: Budget**
+**Stage 4: Lead Submission & Calendly Link**
 ```
-Assistant: Understanding your budget helps us recommend the right approach.
-What budget range are you working with? (e.g., under $10k, $10k-$50k, $50k+,
-or flexible)
+Assistant: [Internally calls submitLeadInformation function with: name, email, location]
 
-User: [Provides budget range]
-```
+Perfect! Here's your Calendly link to schedule a time that works for you:
+https://calendly.com/nafasi
 
-**Stage 6: Next Steps**
-```
-Assistant: Thank you for sharing that information, [Name]! Based on what
-you've told me, I think we can definitely help. Would you like to:
-1. Schedule a free consultation call
-2. Receive more information via email
-3. Explore our services on the website
+I've saved your information and our team will follow up with you after you book
+a meeting. Thanks for connecting with Nafasi!
 
-I'll also make sure our team reaches out to you at [email] within 24 hours.
-
-User: [Selects option or provides feedback]
+User: [Clicks link and schedules meeting OR closes chat]
 ```
 
-**Stage 7: Completion**
-```
-Assistant: Perfect! I've saved your information and our team will be in touch
-shortly. In the meantime, feel free to explore our services on the website.
-Is there anything else I can help you with today?
+### Streamlined Data Capture
 
-User: [Response or closes chat]
-```
-
-### Conversation State Management
-
-**States:**
-1. `initial` - Chat opened, greeting sent
-2. `collecting_name` - Waiting for name
-3. `collecting_email` - Waiting for email
-4. `collecting_project` - Waiting for project description
-5. `collecting_timeline` - Waiting for timeline
-6. `collecting_budget` - Waiting for budget
-7. `offering_next_steps` - Presenting options
-8. `completed` - Qualification complete
-
-**Data Captured:**
+**Data Collected:**
 ```typescript
 interface LeadData {
   name: string
   email: string
-  projectDescription: string
-  timeline: string
-  budgetRange: string
-  preferredNextStep?: 'consultation' | 'email' | 'explore'
+  location: string
 }
+```
+
+**Key Differences from v1.0:**
+- Removed: projectDescription, timeline, budgetRange, country, timezone
+- Added: Direct Calendly integration
+- Simplified: 3-field collection instead of 7 fields
+- Email trigger: Changed from immediate to post-Calendly booking
+
+---
+
+## Calendly Integration
+
+### Webhook Setup
+
+1. Go to [Calendly Settings → Integrations → Webhooks](https://calendly.com/app/settings/integrations/webhooks)
+2. Create a new webhook with these settings:
+   - **URL:** `https://your-domain.com/api/calendly-webhook`
+   - **Events:** Select `invitee.created` and `invitee.canceled`
+   - **Signing Key:** Save this as `CALENDLY_WEBHOOK_SECRET` in your environment
+
+### Flow with Calendly
+
+1. **User completes chatbot** → Lead info saved in Supabase (name, email, location)
+2. **User clicks Calendly link** → Books a meeting time
+3. **Calendly sends webhook** → `invitee.created` event
+4. **Webhook handler** (/api/calendly-webhook):
+   - Updates conversation with `meeting_scheduled: true`
+   - Stores Calendly meeting URL
+   - Sends email notification to your team
+5. **Email includes:**
+   - Lead's contact info
+   - Calendly meeting details
+   - Conversation transcript
+
+### Environment Variables for Calendly
+
+```bash
+CALENDLY_WEBHOOK_SECRET=your-signing-key  # From Calendly webhook settings
+CALENDLY_BOOKING_URL=https://calendly.com/nafasi  # Your Calendly link
 ```
 
 ---
@@ -487,7 +519,7 @@ interface LeadData {
 - 500: Internal server error
 
 #### POST /api/chat/complete
-**Purpose:** Mark conversation as completed and trigger notifications
+**Purpose:** Mark conversation as completed and save lead info
 
 **Request Body:**
 ```typescript
@@ -496,9 +528,7 @@ interface LeadData {
   leadData: {
     name: string
     email: string
-    projectDescription: string
-    timeline: string
-    budgetRange: string
+    location: string
   }
 }
 ```
@@ -508,9 +538,41 @@ interface LeadData {
 {
   success: boolean
   conversationId: string
-  emailSent: boolean
+  isQualified: boolean
+  message: string  // "Email will be sent after Calendly booking"
 }
 ```
+
+#### POST /api/calendly-webhook
+**Purpose:** Receive Calendly events and trigger email after meeting is booked
+
+**Webhook Events:**
+- `invitee.created` - User scheduled a meeting
+- `invitee.canceled` - User cancelled a meeting
+
+**Payload Example:**
+```typescript
+{
+  event: 'invitee.created',
+  payload: {
+    email: string
+    name: string
+    scheduling_url: string  // Calendly meeting URL
+    event_type_uuid: string
+  }
+}
+```
+
+**Response:**
+```typescript
+{
+  success: boolean
+  conversationId: string
+  message: string
+}
+```
+
+**Webhook URL:** `https://your-domain.com/api/calendly-webhook`
 
 ### API Implementation Pattern
 
@@ -830,12 +892,113 @@ export function useChatbot() {
 ## Deployment Checklist
 
 ### Pre-Deployment
-- [ ] Create OpenAI Assistant with proper instructions
-- [ ] Set up Supabase project and run migrations
+- [ ] Create OpenAI Assistant with proper instructions and function calling tool
+- [ ] Set up Supabase project and run migrations (including country/timezone fields)
 - [ ] Configure Row Level Security policies
 - [ ] Set up Resend account and verify sending domain
 - [ ] Configure all environment variables in deployment platform
 - [ ] Test email delivery (avoid spam folder)
+- [ ] Verify all environment variables are set for Production, Preview, AND Development
+
+### Critical Production Fixes
+The following issues were encountered and resolved during production deployment:
+
+#### 1. **TypeScript Strict Mode Compilation**
+**Issue:** Development mode (Turbopack) is lenient with type checking, but production enforces strict compilation.
+
+**Fix:** Added type assertions for Supabase operations:
+```typescript
+// Correct pattern for Supabase operations
+const { data, error } = await (supabaseAdmin() as any)
+  .from('conversations')
+  .insert({...})
+
+// For data after null check
+const conversation = data as any
+```
+
+#### 2. **Lazy Initialization for API Clients**
+**Issue:** Next.js build process tries to instantiate clients during static analysis, causing errors when env vars aren't available.
+
+**Fix:** Convert all API clients to lazy initialization:
+```typescript
+// Supabase
+let _supabaseAdmin: ReturnType<typeof createClient> | null = null
+export const supabaseAdmin = () => {
+  if (!_supabaseAdmin) {
+    _supabaseAdmin = createClient(...)
+  }
+  return _supabaseAdmin
+}
+
+// OpenAI
+let _openai: OpenAI | null = null
+function getOpenAIClient() {
+  if (!_openai) {
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  }
+  return _openai
+}
+
+// Resend
+let _resend: Resend | null = null
+function getResendClient() {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  return _resend
+}
+```
+
+#### 3. **OpenAI SDK v6 API Changes**
+**Issue:** Method signature for `submitToolOutputsStream` changed between versions.
+
+**Correct v6 signature:**
+```typescript
+openai.beta.threads.runs.submitToolOutputsStream(
+  runId,  // First parameter: run ID string
+  {
+    thread_id: threadId,  // thread_id in params object
+    tool_outputs: [{
+      tool_call_id: toolCall.id,
+      output: JSON.stringify({ success: true, message: '...' })
+    }],
+    stream: true
+  }
+)
+```
+
+**Incorrect (v4/v5) signature:**
+```typescript
+// DO NOT USE - this was the old signature
+openai.beta.threads.runs.submitToolOutputsStream(
+  threadId,  // ❌ Wrong parameter order
+  runId,
+  { tool_outputs: [...] }
+)
+```
+
+#### 4. **Chakra UI v3 Breaking Changes**
+**Issue:** IconButton no longer accepts `icon` prop.
+
+**Fix:** Move icon to children:
+```typescript
+// ❌ Old (Chakra v2)
+<IconButton icon={<ChatIcon />} />
+
+// ✅ New (Chakra v3)
+<IconButton>
+  <ChatIcon />
+</IconButton>
+```
+
+#### 5. **Environment Variables Not Available**
+**Issue:** Vercel deployment failed with "supabaseUrl is required" error.
+
+**Solution:** Ensure ALL environment variables are added to Vercel project settings:
+- Navigate to Project → Settings → Environment Variables
+- Add variables for **Production**, **Preview**, AND **Development** environments
+- After adding variables, trigger a redeploy (automatic on next push)
 
 ### Post-Deployment
 - [ ] Verify chatbot loads on production URL
@@ -844,6 +1007,8 @@ export function useChatbot() {
 - [ ] Monitor Supabase for conversation records
 - [ ] Check rate limiting works as expected
 - [ ] Review analytics and conversation quality
+- [ ] Verify function calling (submitLeadInformation) triggers correctly
+- [ ] Test country/timezone collection and storage
 
 ### Monitoring
 - [ ] Set up error tracking (Sentry, LogRocket, etc.)
@@ -851,6 +1016,7 @@ export function useChatbot() {
 - [ ] Track conversion rate (conversations → qualified leads)
 - [ ] Review spam detection accuracy (false positives/negatives)
 - [ ] Monitor email deliverability rates
+- [ ] Track function calling success/failure rates
 
 ---
 
@@ -884,18 +1050,23 @@ export function useChatbot() {
 - Verify OPENAI_ASSISTANT_ID exists and is active
 - Review API route logs for errors
 - Check network requests in browser DevTools
+- Ensure OpenAI client is using lazy initialization
+- Verify function calling tool is configured on Assistant
 
 **Issue:** Messages not saving to Supabase
 - Verify SUPABASE_SERVICE_ROLE_KEY has write permissions
 - Check RLS policies allow inserts
 - Review Supabase logs for errors
-- Confirm conversations table exists
+- Confirm conversations table exists with country/timezone columns
+- Ensure Supabase client uses lazy initialization pattern
+- Add type assertions `(supabaseAdmin() as any)` if TypeScript errors occur
 
 **Issue:** Email notifications not sending
 - Verify RESEND_API_KEY is valid
 - Check sending domain is verified in Resend
 - Review spam folder for test emails
 - Confirm NOTIFICATION_EMAIL is correct
+- Ensure Resend client uses lazy initialization pattern
 
 **Issue:** Rate limiting not working
 - Check IP address is being captured correctly
@@ -908,6 +1079,41 @@ export function useChatbot() {
 - Adjust SPAM_SCORE_THRESHOLD if needed
 - Whitelist legitimate domains if incorrectly flagged
 - Monitor spam_score values in database
+
+### Production Build Errors
+
+**Error:** `Type error: Property 'messages' does not exist on type 'never'`
+**Solution:** Add type assertion after null check:
+```typescript
+const { data, error } = await supabaseAdmin().from('conversations').select('*').eq('id', id).single()
+if (fetchError || !data) { return ... }
+const conversation = data as any  // Type assertion needed
+```
+
+**Error:** `Error: supabaseUrl is required`
+**Solution:**
+1. Verify environment variables are set in Vercel (Project → Settings → Environment Variables)
+2. Ensure variables are added for all environments (Production, Preview, Development)
+3. Redeploy after adding variables
+
+**Error:** `Type error: Argument of type 'string' is not assignable to parameter`
+**Solution:** Check OpenAI SDK version and use correct method signature:
+```typescript
+// OpenAI SDK v6+
+openai.beta.threads.runs.submitToolOutputsStream(
+  runId,
+  { thread_id: threadId, tool_outputs: [...], stream: true }
+)
+```
+
+**Error:** `Property 'icon' does not exist on type 'IconButtonProps'`
+**Solution:** Update to Chakra UI v3 pattern:
+```typescript
+<IconButton><SvgIcon /></IconButton>  // Not icon={<SvgIcon />}
+```
+
+**Error:** `Error parsing lead data: Path parameters result in path with invalid segments`
+**Solution:** Ensure thread_id is included in params object and not passed as separate parameter to `submitToolOutputsStream`
 
 ---
 
@@ -933,6 +1139,50 @@ export function useChatbot() {
 
 ---
 
-*Last Updated: January 2025*
-*Version: 1.0*
+## Version History
+
+### Version 2.0 (November 2025) - STREAMLINED WITH CALENDLY INTEGRATION
+**Major Changes:**
+- **Simplified lead data collection:** Now only collects name, email, and location (was: 7 fields)
+- **Calendly integration:** Provides Calendly booking link immediately after lead qualification
+- **Email trigger change:** Emails now sent AFTER Calendly meeting is booked (was: immediately after qualification)
+- **New webhook endpoint:** `/api/calendly-webhook` receives booking confirmations from Calendly
+- **Database migration:** Added `location`, `meeting_scheduled`, `calendly_meeting_url` fields
+
+**Migration Guide from v1.1:**
+1. Run migration: `supabase migration up` (applies 003_streamline_chatbot_for_calendly.sql)
+2. Update OpenAI Assistant:
+   - Use new simplified instructions (see Assistant Configuration section)
+   - Update function calling tool to only include name, email, location
+3. Set up Calendly webhook:
+   - Get webhook URL: `https://your-domain.com/api/calendly-webhook`
+   - Set events: `invitee.created`, `invitee.canceled`
+   - Save signing key as `CALENDLY_WEBHOOK_SECRET`
+4. Add new environment variable:
+   - `CALENDLY_WEBHOOK_SECRET` - from Calendly webhook settings
+5. Deploy updated code with new `/api/calendly-webhook` endpoint
+
+**Benefits:**
+- Faster conversation flow (3 fields instead of 7)
+- Higher completion rate (simpler for users)
+- Verified meeting bookings (only send email after Calendly confirms)
+- Better lead quality tracking
+
+### Version 1.1 (November 2025)
+- Added country and timezone fields to lead qualification
+- Implemented OpenAI function calling for lead submission
+- Fixed production deployment issues (TypeScript strict mode, lazy initialization)
+- Updated for OpenAI SDK v6, Chakra UI v3, Next.js 16 compatibility
+- Enhanced documentation with troubleshooting for production errors
+
+### Version 1.0 (January 2025)
+- Initial implementation with OpenAI Assistant API
+- Spam detection and rate limiting
+- Email notifications via Resend
+- Supabase conversation storage
+
+---
+
+*Last Updated: November 2025*
+*Version: 2.0*
 *Maintainer: Nafasi Development Team*

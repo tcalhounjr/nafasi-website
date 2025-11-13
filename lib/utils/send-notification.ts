@@ -12,12 +12,9 @@ function getResendClient() {
 interface LeadData {
   name: string
   email: string
-  projectDescription: string
-  timeline: string
-  budgetRange: string
-  country: string
-  timezone: string
+  location: string
   messages: Array<{ role: string; content: string; timestamp?: string }>
+  calendlyLink?: string
 }
 
 function generateEmailHTML(leadData: LeadData): string {
@@ -159,29 +156,22 @@ function generateEmailHTML(leadData: LeadData): string {
       </div>
 
       <div class="field">
-        <div class="field-label">Project Description</div>
-        <div class="field-value">${leadData.projectDescription}</div>
+        <div class="field-label">Location</div>
+        <div class="field-value">${leadData.location}</div>
       </div>
 
+      ${
+        leadData.calendlyLink
+          ? `
       <div class="field">
-        <div class="field-label">Timeline</div>
-        <div class="field-value">${leadData.timeline}</div>
+        <div class="field-label">Calendly Meeting</div>
+        <div class="field-value">
+          <a href="${leadData.calendlyLink}" style="background: #31b292; color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none; display: inline-block;">View Meeting Details</a>
+        </div>
       </div>
-
-      <div class="field">
-        <div class="field-label">Budget Range</div>
-        <div class="field-value">${leadData.budgetRange}</div>
-      </div>
-
-      <div class="field">
-        <div class="field-label">Country</div>
-        <div class="field-value">${leadData.country}</div>
-      </div>
-
-      <div class="field">
-        <div class="field-label">Timezone</div>
-        <div class="field-value">${leadData.timezone}</div>
-      </div>
+      `
+          : ''
+      }
 
       <div class="transcript">
         <h3>Conversation Transcript</h3>
@@ -189,8 +179,8 @@ function generateEmailHTML(leadData: LeadData): string {
       </div>
 
       <div class="footer">
-        <strong>Next Steps:</strong>
-        <p>Follow up with ${leadData.name} within 24 hours at <a href="mailto:${leadData.email}">${leadData.email}</a></p>
+        <strong>Status:</strong>
+        <p>${leadData.calendlyLink ? 'Meeting scheduled - Lead has booked a consultation time' : 'Lead information received - Awaiting Calendly booking'}</p>
       </div>
     </div>
   </div>
