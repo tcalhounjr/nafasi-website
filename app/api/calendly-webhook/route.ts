@@ -50,22 +50,24 @@ export async function POST(req: Request) {
 
     // Handle invitee.created event (meeting scheduled)
     if (body.event === 'invitee.created') {
-      const { payload: eventPayload } = body
+      // Support both v1 and v2 API formats
+      const eventPayload = body.payload || body.resource
 
       if (!eventPayload) {
+        console.log('Missing payload or resource in webhook body')
         return new Response(
           JSON.stringify({ error: 'Missing payload' }),
           { status: 400, headers: { 'Content-Type': 'application/json' } }
         )
       }
 
-      const {
-        email,
-        name,
-        scheduling_url, // Calendly meeting link
-        event_type_uuid,
-        questions_and_answers, // Custom question answers from Calendly form
-      } = eventPayload
+      // Extract fields (v2 API format)
+      const email = eventPayload.email
+      const name = eventPayload.name
+      const scheduling_url = eventPayload.scheduling_url || eventPayload.uri // v2 uses uri
+      const questions_and_answers = eventPayload.questions_and_answers || []
+
+      console.log('Extracted from webhook:', { email, name, scheduling_url, qa_count: questions_and_answers.length })
 
       console.log('Meeting scheduled for:', { email, name, scheduling_url })
 

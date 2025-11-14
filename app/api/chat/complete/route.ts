@@ -6,8 +6,13 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { conversationId, leadData } = body
 
+    console.log('=== /api/chat/complete called ===')
+    console.log('conversationId:', conversationId)
+    console.log('leadData:', leadData)
+
     // Validate required fields
     if (!conversationId || !leadData) {
+      console.log('Missing required fields')
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
