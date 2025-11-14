@@ -42,18 +42,21 @@ export default function MessageBubble({ role, parts, timestamp }: MessageBubbleP
     return parts.map((part, index) => {
       if (urlRegex.test(part)) {
         return (
-          <Text
+          <a
             key={index}
-            as="a"
             href={part}
             target="_blank"
             rel="noopener noreferrer"
-            textDecoration="underline"
-            _hover={{ opacity: 0.8 }}
-            display="inline"
+            style={{
+              textDecoration: 'underline',
+              opacity: 1,
+              transition: 'opacity 0.2s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.8')}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >
             {part}
-          </Text>
+          </a>
         )
       }
       return <span key={index}>{part}</span>
