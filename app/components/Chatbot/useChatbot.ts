@@ -11,7 +11,7 @@ interface Message {
 interface LeadData {
   name: string
   email: string
-  location: string
+  project_description: string
 }
 
 export function useChatbot(isOpen: boolean) {

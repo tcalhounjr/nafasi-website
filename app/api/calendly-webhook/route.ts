@@ -182,7 +182,7 @@ export async function POST(req: Request) {
         const emailResult = await sendLeadNotification({
           name: conversation.name,
           email: conversation.email,
-          location: conversation.location,
+          project_description: conversation.project_description,
           messages: conversation.messages,
           calendlyLink: scheduling_url,
         })

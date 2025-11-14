@@ -2,6 +2,9 @@
 -- This migration adds fields for Calendly webhook integration and meeting tracking
 
 ALTER TABLE conversations
+-- Add streamlined lead data field (project description replaces location for better pre-meeting prep)
+ADD COLUMN IF NOT EXISTS project_description TEXT,
+
 -- Add Calendly-specific fields
 ADD COLUMN IF NOT EXISTS calendly_meeting_url TEXT,
 ADD COLUMN IF NOT EXISTS calendly_meeting_created_at TIMESTAMP WITH TIME ZONE,
