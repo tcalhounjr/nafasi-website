@@ -12,7 +12,7 @@ function getResendClient() {
 interface LeadData {
   name: string
   email: string
-  location: string
+  project_description: string
   messages: Array<{ role: string; content: string; timestamp?: string }>
   calendlyLink?: string
 }
@@ -156,8 +156,8 @@ function generateEmailHTML(leadData: LeadData): string {
       </div>
 
       <div class="field">
-        <div class="field-label">Location</div>
-        <div class="field-value">${leadData.location}</div>
+        <div class="field-label">Project Description</div>
+        <div class="field-value">${leadData.project_description}</div>
       </div>
 
       ${

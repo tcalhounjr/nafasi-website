@@ -6,9 +6,10 @@ interface MessageBubbleProps {
   role: 'user' | 'assistant'
   parts: Array<{ type: 'text'; text: string }>
   timestamp?: string
+  conversationId?: string
 }
 
-export default function MessageBubble({ role, parts, timestamp }: MessageBubbleProps) {
+export default function MessageBubble({ role, parts, timestamp, conversationId }: MessageBubbleProps) {
   const isUser = role === 'user'
 
   // Format timestamp
@@ -41,10 +42,17 @@ export default function MessageBubble({ role, parts, timestamp }: MessageBubbleP
 
     return parts.map((part, index) => {
       if (urlRegex.test(part)) {
+        // Append session_id to Calendly links
+        let href = part
+        if (href.includes('calendly.com') && conversationId) {
+          const separator = href.includes('?') ? '&' : '?'
+          href = `${href}${separator}session_id=${conversationId}`
+        }
+
         return (
           <a
             key={index}
-            href={part}
+            href={href}
             target="_blank"
             rel="noopener noreferrer"
             style={{

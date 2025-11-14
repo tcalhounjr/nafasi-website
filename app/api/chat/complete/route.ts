@@ -1,14 +1,18 @@
 import { supabaseAdmin } from '@/lib/utils/supabase'
 import { checkForSpam } from '@/lib/utils/spam-detection'
-import { sendLeadNotification } from '@/lib/utils/send-notification'
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
     const { conversationId, leadData } = body
 
+    console.log('=== /api/chat/complete called ===')
+    console.log('conversationId:', conversationId)
+    console.log('leadData:', leadData)
+
     // Validate required fields
     if (!conversationId || !leadData) {
+      console.log('Missing required fields')
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
@@ -33,7 +37,7 @@ export async function POST(req: Request) {
     // Type assertion needed because Supabase types don't narrow properly
     const conversation = data as any
 
-    // Spam check on lead data (streamlined: only name, email, location)
+    // Spam check on lead data (streamlined: only name, email, project_description)
     const spamCheck = checkForSpam({
       name: leadData.name,
       email: leadData.email,
@@ -50,7 +54,7 @@ export async function POST(req: Request) {
       .update({
         name: leadData.name,
         email: leadData.email,
-        location: leadData.location,
+        project_description: leadData.project_description,
         is_qualified: !spamCheck.isSpam,
         is_completed: true,
         spam_score: spamCheck.score,

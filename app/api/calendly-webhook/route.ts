@@ -37,7 +37,9 @@ export async function POST(req: Request) {
     const signature = headersList.get('X-Calendly-Signature') || ''
     const body = await req.json()
 
-    console.log('Calendly webhook received:', JSON.stringify(body, null, 2))
+    console.log('=== CALENDLY WEBHOOK RECEIVED ===')
+    console.log('Webhook body:', JSON.stringify(body, null, 2))
+    console.log('Event type:', body.event)
 
     // Verify webhook authenticity
     const payload = await req.text()
@@ -48,52 +50,120 @@ export async function POST(req: Request) {
 
     // Handle invitee.created event (meeting scheduled)
     if (body.event === 'invitee.created') {
-      const { payload: eventPayload } = body
+      // Support both v1 and v2 API formats
+      const eventPayload = body.payload || body.resource
 
       if (!eventPayload) {
+        console.log('Missing payload or resource in webhook body')
         return new Response(
           JSON.stringify({ error: 'Missing payload' }),
           { status: 400, headers: { 'Content-Type': 'application/json' } }
         )
       }
 
-      const {
-        email,
-        name,
-        scheduling_url, // Calendly meeting link
-        event_type_uuid,
-      } = eventPayload
+      // Extract fields (v2 API format)
+      const email = eventPayload.email
+      const name = eventPayload.name
+      const scheduling_url = eventPayload.scheduling_url || eventPayload.uri // v2 uses uri
+      const questions_and_answers = eventPayload.questions_and_answers || []
 
-      console.log('Meeting scheduled for:', { email, name })
+      console.log('Extracted from webhook:', { email, name, scheduling_url, qa_count: questions_and_answers.length })
 
-      // Find the conversation in Supabase by email
-      const { data: conversations, error: fetchError } = await supabaseAdmin()
-        .from('conversations')
-        .select('*')
-        .eq('email', email)
-        .eq('is_completed', true)
-        .eq('meeting_scheduled', false)
-        .order('created_at', { ascending: false })
-        .limit(1)
+      console.log('Meeting scheduled for:', { email, name, scheduling_url })
 
-      if (fetchError) {
-        console.error('Error fetching conversation:', fetchError)
-        return new Response(
-          JSON.stringify({ error: 'Database error' }),
-          { status: 500, headers: { 'Content-Type': 'application/json' } }
-        )
+      // Extract meeting ID from custom question answers (human verification flow)
+      // User enters formatted ID like "ID123456" which we need to match back to conversation
+      let meetingIdAnswer: string | null = null
+
+      if (questions_and_answers && Array.isArray(questions_and_answers)) {
+        for (const qa of questions_and_answers) {
+          // Look for any question containing "meeting" or "session" keywords
+          if (qa.question && (qa.question.toLowerCase().includes('meeting') || qa.question.toLowerCase().includes('session'))) {
+            meetingIdAnswer = qa.answer?.trim() || null
+            break
+          }
+        }
       }
 
-      if (!conversations || conversations.length === 0) {
-        console.warn('No matching conversation found for email:', email)
+      console.log('Extracted meeting ID from custom question answer:', meetingIdAnswer)
+
+      // Helper function to convert UUID to meeting ID format
+      const getMeetingId = (uuid: string): string => {
+        const hash = uuid.split('').reduce((acc: number, char: string) => {
+          return ((acc << 5) - acc) + char.charCodeAt(0)
+        }, 0)
+        const randomDigits = String(Math.abs(hash) % 1000000).padStart(6, '0')
+        return `ID${randomDigits}`
+      }
+
+      let conversation: any = null
+      let foundByMeetingId = false
+
+      // First, try to find conversation by matching meeting ID format from custom question
+      if (meetingIdAnswer) {
+        // Get all completed, unscheduled conversations and check their meeting IDs
+        const { data: conversations, error: fetchError } = await (supabaseAdmin() as any)
+          .from('conversations')
+          .select('*')
+          .eq('is_completed', true)
+          .eq('meeting_scheduled', false)
+          .order('created_at', { ascending: false })
+          .limit(10)
+
+        if (!fetchError && conversations && Array.isArray(conversations)) {
+          // Find the conversation whose meeting ID matches the user's answer
+          for (const conv of conversations) {
+            if (getMeetingId(conv.id) === meetingIdAnswer) {
+              conversation = conv
+              foundByMeetingId = true
+              console.log('Found conversation by meeting ID match:', meetingIdAnswer, 'UUID:', conv.id)
+              break
+            }
+          }
+        }
+
+        if (!foundByMeetingId) {
+          console.warn('No conversation found matching meeting ID:', meetingIdAnswer)
+        }
+      }
+
+      // Fall back to finding by email if meeting ID didn't work
+      if (!conversation) {
+        console.log('Falling back to email-based lookup for:', email)
+        const { data: conversations, error: fetchError } = await (supabaseAdmin() as any)
+          .from('conversations')
+          .select('*')
+          .eq('email', email)
+          .eq('is_completed', true)
+          .eq('meeting_scheduled', false)
+          .order('created_at', { ascending: false })
+          .limit(1)
+
+        if (fetchError) {
+          console.error('Error fetching conversation by email:', fetchError)
+          return new Response(
+            JSON.stringify({ error: 'Database error' }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+          )
+        }
+
+        if (conversations && conversations.length > 0) {
+          conversation = conversations[0]
+          console.log('Found conversation by email (fallback):', email)
+        }
+      }
+
+      if (!conversation) {
+        console.warn('=== NO CONVERSATION FOUND ===')
+        console.warn('Meeting ID answer:', meetingIdAnswer)
+        console.warn('Email:', email)
+        console.warn('Found by meeting ID:', foundByMeetingId)
         // Still return 200 to acknowledge webhook receipt
         return new Response(
           JSON.stringify({ success: true, message: 'Webhook received but no matching conversation' }),
           { status: 200, headers: { 'Content-Type': 'application/json' } }
         )
       }
-
-      const conversation = conversations[0] as any
 
       // Update conversation with meeting details
       const { error: updateError } = await (supabaseAdmin() as any)
@@ -115,21 +185,30 @@ export async function POST(req: Request) {
       }
 
       // Send email notification now that meeting is confirmed
-      if (conversation.is_qualified) {
-        const emailResult = await sendLeadNotification({
-          name: conversation.name,
-          email: conversation.email,
-          location: conversation.location,
-          messages: conversation.messages,
-          calendlyLink: scheduling_url,
-        })
+      // Note: We send email for all meetings booked (already verified as human via Meeting ID entry)
+      console.log('=== SENDING EMAIL NOTIFICATION ===')
+      console.log('Conversation data:', {
+        id: conversation.id,
+        name: conversation.name,
+        email: conversation.email,
+        project_description: conversation.project_description,
+        has_messages: !!conversation.messages,
+      })
 
-        console.log('Lead notification email sent:', {
-          conversationId: conversation.id,
-          email: conversation.email,
-          success: emailResult.success,
-        })
-      }
+      const emailResult = await sendLeadNotification({
+        name: conversation.name,
+        email: conversation.email,
+        project_description: conversation.project_description,
+        messages: conversation.messages,
+        calendlyLink: scheduling_url,
+      })
+
+      console.log('=== EMAIL RESULT ===')
+      console.log('Lead notification email sent:', {
+        conversationId: conversation.id,
+        email: conversation.email,
+        success: emailResult.success,
+      })
 
       return new Response(
         JSON.stringify({

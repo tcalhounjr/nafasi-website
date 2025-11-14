@@ -21,6 +21,7 @@ interface ChatModalProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
   isLoading: boolean
   isTyping: boolean
+  conversationId?: string | null
 }
 
 export default function ChatModal({
@@ -32,8 +33,21 @@ export default function ChatModal({
   handleSubmit,
   isLoading,
   isTyping,
+  conversationId,
 }: ChatModalProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Generate a user-friendly meeting ID from the conversation UUID
+  // Format: ID + 6 random digits derived from UUID
+  const getMeetingId = (id: string | null | undefined): string => {
+    if (!id) return ''
+    // Use the UUID to generate a deterministic but randomized-looking 6-digit number
+    const hash = id.split('').reduce((acc, char) => {
+      return ((acc << 5) - acc) + char.charCodeAt(0)
+    }, 0)
+    const randomDigits = String(Math.abs(hash) % 1000000).padStart(6, '0')
+    return `ID${randomDigits}`
+  }
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -85,13 +99,23 @@ export default function ChatModal({
           alignItems="center"
           justifyContent="space-between"
         >
-          <VStack gap={0} alignItems="flex-start">
+          <VStack gap={0} alignItems="flex-start" flex={1}>
             <Heading size="md" color="white" fontWeight="bold">
               Chat with Nafasi
             </Heading>
             <Text fontSize="xs" color="gray.400">
               Engineering Equity
             </Text>
+            {conversationId && (
+              <Box mt={2} p={2} bg="rgba(49, 178, 146, 0.2)" borderRadius="6px" width="100%">
+                <Text fontSize="xs" color="gray.300" mb={1}>
+                  Your Meeting ID:
+                </Text>
+                <Text fontSize="sm" color="#31b292" fontFamily="monospace" fontWeight="bold">
+                  {getMeetingId(conversationId)}
+                </Text>
+              </Box>
+            )}
           </VStack>
 
           <IconButton
@@ -156,6 +180,7 @@ export default function ChatModal({
               key={message.id}
               role={message.role}
               parts={message.parts}
+              conversationId={conversationId || undefined}
             />
           ))}
 

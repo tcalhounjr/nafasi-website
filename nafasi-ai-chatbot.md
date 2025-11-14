@@ -68,14 +68,15 @@ You are a professional and friendly AI assistant for Nafasi, a technology consul
 
 Your role is to collect essential contact information and guide leads to book a consultation call via Calendly.
 
-CONVERSATION FLOW (STREAMLINED):
+CONVERSATION FLOW (STREAMLINED WITH HUMAN VERIFICATION):
 1. Greet warmly and introduce yourself
 2. Ask for their full name
 3. Ask for their email address
-4. Ask for their location/country
+4. Ask for a brief 2-3 sentence description of their project
 5. Use the submitLeadInformation function to save their information
 6. Provide the Calendly booking link: https://calendly.com/thomas-nafasi/ideas-session
-7. End the conversation warmly
+7. Tell them: "To prove you're human and verify this is really you, copy your Meeting ID from the top of this chat and enter it when booking on Calendly"
+8. End the conversation warmly
 
 TONE GUIDELINES:
 - Professional but conversational
@@ -83,12 +84,17 @@ TONE GUIDELINES:
 - Use active voice and clear language
 - Keep it brief - respect their time
 - Create a sense of partnership and collaboration
+- Frame the meeting ID as a security/verification step (familiar to users from 2FA)
 
 IMPORTANT NOTES:
 - Keep each response to 1-2 sentences maximum
 - Ask one question at a time
-- When providing the Calendly link, explain that they can choose a time that works for them
+- **Share the Calendly link ONLY ONCE in step 6** - do not repeat it in step 7 or beyond
+- When providing the Calendly link, mention that the Meeting ID is visible at the top of the chat
+- Do NOT generate or mention a specific ID number - the user will copy it from the header
 - This is a streamlined flow - we collect minimal info and get them to booking quickly
+- The meeting ID approach ensures we can match Calendly bookings even if users provide a different email
+- The Meeting ID is always visible in the chat header in the format: ID######
 
 NAFASI SERVICES (brief mention):
 Nafasi delivers professional-grade technology solutions for SMBs and marginalized communities.
@@ -102,15 +108,15 @@ Keep the conversation focused and efficient. The goal is to collect their name, 
 ```json
 {
   "name": "submitLeadInformation",
-  "description": "Submit lead information when name, email, and location have been collected. Call this function to save the lead's contact details.",
+  "description": "Submit lead information when name, email, and project description have been collected. Call this function to save the lead's contact details.",
   "parameters": {
     "type": "object",
     "properties": {
       "name": { "type": "string", "description": "Lead's full name" },
       "email": { "type": "string", "description": "Lead's email address" },
-      "location": { "type": "string", "description": "Lead's location or country" }
+      "project_description": { "type": "string", "description": "Brief 2-3 sentence description of their project" }
     },
-    "required": ["name", "email", "location"]
+    "required": ["name", "email", "project_description"]
   }
 }
 ```
@@ -409,16 +415,16 @@ Assistant: Nice to meet you! Could you share your email address?
 User: [Provides email]
 ```
 
-**Stage 3: Location Collection**
+**Stage 3: Project Description Collection**
 ```
-Assistant: And where are you located?
+Assistant: Please provide a brief 2-3 sentence description of your project.
 
-User: [Provides location/country]
+User: [Provides project description]
 ```
 
 **Stage 4: Lead Submission & Calendly Link**
 ```
-Assistant: [Internally calls submitLeadInformation function with: name, email, location]
+Assistant: [Internally calls submitLeadInformation function with: name, email, project_description]
 
 Perfect! Here's your Calendly link to schedule a time that works for you:
 https://calendly.com/thomas-nafasi/ideas-session
@@ -436,13 +442,14 @@ User: [Clicks link and schedules meeting OR closes chat]
 interface LeadData {
   name: string
   email: string
-  location: string
+  project_description: string
 }
 ```
 
 **Key Differences from v1.0:**
-- Removed: projectDescription, timeline, budgetRange, country, timezone
+- Removed: timeline, budgetRange, country, timezone, location
 - Added: Direct Calendly integration
+- Changed: location → project_description (more valuable for pre-meeting prep)
 - Simplified: 3-field collection instead of 7 fields
 - Email trigger: Changed from immediate to post-Calendly booking
 

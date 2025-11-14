@@ -11,7 +11,7 @@ interface Message {
 interface LeadData {
   name: string
   email: string
-  location: string
+  project_description: string
 }
 
 export function useChatbot(isOpen: boolean) {
@@ -262,9 +262,23 @@ export function useChatbot(isOpen: boolean) {
                     return newMessages
                   })
                 } else if (data.type === 'lead-submitted') {
-                  // Store lead data - don't auto-submit, let user close or continue
+                  // Store lead data and auto-complete conversation
                   console.log('Lead information submitted:', data.leadData)
                   setLeadData(data.leadData)
+
+                  // Auto-complete the conversation now that we have lead data
+                  // This makes the conversation available for Calendly webhook matching
+                  if (conversationId) {
+                    console.log('Auto-completing conversation with lead data')
+                    completeConversation(data.leadData)
+                      .then((result) => {
+                        console.log('Conversation auto-completed:', result)
+                        setLeadSubmitted(true)
+                      })
+                      .catch((err) => {
+                        console.error('Error auto-completing conversation:', err)
+                      })
+                  }
                 } else if (data.type === 'finish') {
                   break
                 }
