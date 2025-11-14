@@ -62,38 +62,71 @@ export async function POST(req: Request) {
         name,
         scheduling_url, // Calendly meeting link
         event_type_uuid,
+        questions_and_answers, // Custom question answers from Calendly form
       } = eventPayload
 
       console.log('Meeting scheduled for:', { email, name, scheduling_url })
 
-      // Extract session_id from scheduling_url if present
-      const urlParams = new URL(scheduling_url).searchParams
-      const sessionId = urlParams.get('session_id')
+      // Extract meeting ID from custom question answers (human verification flow)
+      // User enters formatted ID like "ID123456" which we need to match back to conversation
+      let meetingIdAnswer: string | null = null
 
-      console.log('Extracted session_id from URL:', sessionId)
-
-      let conversation: any = null
-
-      // First, try to find conversation by session_id (more reliable)
-      if (sessionId) {
-        const { data: conversations, error: fetchError } = await supabaseAdmin()
-          .from('conversations')
-          .select('*')
-          .eq('id', sessionId)
-          .single()
-
-        if (fetchError) {
-          console.warn('Error fetching conversation by session_id:', fetchError)
-        } else if (conversations) {
-          conversation = conversations
-          console.log('Found conversation by session_id:', sessionId)
+      if (questions_and_answers && Array.isArray(questions_and_answers)) {
+        for (const qa of questions_and_answers) {
+          // Look for any question containing "meeting" or "session" keywords
+          if (qa.question && (qa.question.toLowerCase().includes('meeting') || qa.question.toLowerCase().includes('session'))) {
+            meetingIdAnswer = qa.answer?.trim() || null
+            break
+          }
         }
       }
 
-      // Fall back to finding by email if session_id didn't work
+      console.log('Extracted meeting ID from custom question answer:', meetingIdAnswer)
+
+      // Helper function to convert UUID to meeting ID format
+      const getMeetingId = (uuid: string): string => {
+        const hash = uuid.split('').reduce((acc: number, char: string) => {
+          return ((acc << 5) - acc) + char.charCodeAt(0)
+        }, 0)
+        const randomDigits = String(Math.abs(hash) % 1000000).padStart(6, '0')
+        return `ID${randomDigits}`
+      }
+
+      let conversation: any = null
+      let foundByMeetingId = false
+
+      // First, try to find conversation by matching meeting ID format from custom question
+      if (meetingIdAnswer) {
+        // Get all completed, unscheduled conversations and check their meeting IDs
+        const { data: conversations, error: fetchError } = await (supabaseAdmin() as any)
+          .from('conversations')
+          .select('*')
+          .eq('is_completed', true)
+          .eq('meeting_scheduled', false)
+          .order('created_at', { ascending: false })
+          .limit(10)
+
+        if (!fetchError && conversations && Array.isArray(conversations)) {
+          // Find the conversation whose meeting ID matches the user's answer
+          for (const conv of conversations) {
+            if (getMeetingId(conv.id) === meetingIdAnswer) {
+              conversation = conv
+              foundByMeetingId = true
+              console.log('Found conversation by meeting ID match:', meetingIdAnswer, 'UUID:', conv.id)
+              break
+            }
+          }
+        }
+
+        if (!foundByMeetingId) {
+          console.warn('No conversation found matching meeting ID:', meetingIdAnswer)
+        }
+      }
+
+      // Fall back to finding by email if meeting ID didn't work
       if (!conversation) {
         console.log('Falling back to email-based lookup for:', email)
-        const { data: conversations, error: fetchError } = await supabaseAdmin()
+        const { data: conversations, error: fetchError } = await (supabaseAdmin() as any)
           .from('conversations')
           .select('*')
           .eq('email', email)
@@ -112,12 +145,12 @@ export async function POST(req: Request) {
 
         if (conversations && conversations.length > 0) {
           conversation = conversations[0]
-          console.log('Found conversation by email:', email)
+          console.log('Found conversation by email (fallback):', email)
         }
       }
 
       if (!conversation) {
-        console.warn('No matching conversation found for session_id:', sessionId, 'or email:', email)
+        console.warn('No matching conversation found for meeting ID:', meetingIdAnswer, 'or email:', email)
         // Still return 200 to acknowledge webhook receipt
         return new Response(
           JSON.stringify({ success: true, message: 'Webhook received but no matching conversation' }),

@@ -102,6 +102,7 @@ export async function POST(req: Request) {
     const { conversationId, threadId, messages: clientMessages, metadata } = body
 
     console.log('Received body:', JSON.stringify(body, null, 2))
+    console.log('Conversation ID for this session:', conversationId)
 
     // Extract the last user message
     // AI SDK v5 sends messages as an array with { text: string } format
