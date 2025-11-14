@@ -253,12 +253,16 @@ export async function POST(req: Request) {
                   if (toolCall.type === 'function' && toolCall.function.name === 'submitLeadInformation') {
                     try {
                       const leadData = JSON.parse(toolCall.function.arguments)
-                      console.log('Lead qualification completed:', leadData)
+                      console.log('Lead information submitted:', leadData)
 
-                      // Send lead-qualified event to frontend
+                      // Send lead-submitted event to frontend (minimal fields)
                       safeEnqueue(encoder.encode(`data: ${JSON.stringify({
-                        type: 'lead-qualified',
-                        leadData: leadData
+                        type: 'lead-submitted',
+                        leadData: {
+                          name: leadData.name,
+                          email: leadData.email,
+                          location: leadData.location
+                        }
                       })}\n\n`))
 
                       // Submit tool output to OpenAI and continue streaming

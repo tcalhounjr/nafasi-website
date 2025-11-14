@@ -11,11 +11,7 @@ interface Message {
 interface LeadData {
   name: string
   email: string
-  projectDescription: string
-  timeline: string
-  budgetRange: string
-  country: string
-  timezone: string
+  location: string
 }
 
 export function useChatbot(isOpen: boolean) {
@@ -265,23 +261,10 @@ export function useChatbot(isOpen: boolean) {
                     newMessages[newMessages.length - 1] = { ...assistantMessage }
                     return newMessages
                   })
-                } else if (data.type === 'lead-qualified') {
-                  // Store lead data and trigger completion
-                  console.log('Lead qualification detected:', data.leadData)
+                } else if (data.type === 'lead-submitted') {
+                  // Store lead data - don't auto-submit, let user close or continue
+                  console.log('Lead information submitted:', data.leadData)
                   setLeadData(data.leadData)
-
-                  // Auto-submit lead if not already submitted
-                  if (!leadSubmitted) {
-                    try {
-                      const result = await completeConversation(data.leadData)
-                      if (result.success) {
-                        setLeadSubmitted(true)
-                        console.log('Lead successfully submitted:', result)
-                      }
-                    } catch (err) {
-                      console.error('Error submitting lead:', err)
-                    }
-                  }
                 } else if (data.type === 'finish') {
                   break
                 }

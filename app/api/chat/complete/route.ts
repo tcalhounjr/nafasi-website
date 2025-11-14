@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     // Type assertion needed because Supabase types don't narrow properly
     const conversation = data as any
 
-    // Comprehensive spam check on lead data
+    // Spam check on lead data (streamlined: only name, email, location)
     const spamCheck = checkForSpam({
       name: leadData.name,
       email: leadData.email,
@@ -43,17 +43,14 @@ export async function POST(req: Request) {
         new Date().getTime() - new Date(conversation.created_at).getTime(),
     })
 
-    // Update conversation with lead data and spam score
+    // Update conversation with lead data (streamlined fields only)
+    // NOTE: Email is sent AFTER Calendly meeting is created (via webhook)
     const { error: updateError } = await (supabaseAdmin() as any)
       .from('conversations')
       .update({
         name: leadData.name,
         email: leadData.email,
-        project_description: leadData.projectDescription,
-        timeline: leadData.timeline,
-        budget_range: leadData.budgetRange,
-        country: leadData.country,
-        timezone: leadData.timezone,
+        location: leadData.location,
         is_qualified: !spamCheck.isSpam,
         is_completed: true,
         spam_score: spamCheck.score,
@@ -68,28 +65,19 @@ export async function POST(req: Request) {
       )
     }
 
-    // Send email notification if qualified (not spam)
-    let emailSent = false
-    if (!spamCheck.isSpam) {
-      const emailResult = await sendLeadNotification({
-        ...leadData,
-        messages: conversation.messages,
-      })
-      emailSent = emailResult.success
-    } else {
-      console.warn('Conversation marked as spam, skipping email notification:', {
-        conversationId,
-        score: spamCheck.score,
-        reasons: spamCheck.reasons,
-      })
-    }
+    console.log('Lead information saved (email will be sent after Calendly booking):', {
+      conversationId,
+      name: leadData.name,
+      email: leadData.email,
+      isQualified: !spamCheck.isSpam,
+    })
 
     return new Response(
       JSON.stringify({
         success: true,
         conversationId,
         isQualified: !spamCheck.isSpam,
-        emailSent,
+        message: 'Lead information saved. Email will be sent after Calendly meeting is scheduled.',
         spamCheck: spamCheck.isSpam
           ? { score: spamCheck.score, reasons: spamCheck.reasons }
           : undefined,
