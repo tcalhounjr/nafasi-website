@@ -64,36 +64,66 @@ export async function POST(req: Request) {
         event_type_uuid,
       } = eventPayload
 
-      console.log('Meeting scheduled for:', { email, name })
+      console.log('Meeting scheduled for:', { email, name, scheduling_url })
 
-      // Find the conversation in Supabase by email
-      const { data: conversations, error: fetchError } = await supabaseAdmin()
-        .from('conversations')
-        .select('*')
-        .eq('email', email)
-        .eq('is_completed', true)
-        .eq('meeting_scheduled', false)
-        .order('created_at', { ascending: false })
-        .limit(1)
+      // Extract session_id from scheduling_url if present
+      const urlParams = new URL(scheduling_url).searchParams
+      const sessionId = urlParams.get('session_id')
 
-      if (fetchError) {
-        console.error('Error fetching conversation:', fetchError)
-        return new Response(
-          JSON.stringify({ error: 'Database error' }),
-          { status: 500, headers: { 'Content-Type': 'application/json' } }
-        )
+      console.log('Extracted session_id from URL:', sessionId)
+
+      let conversation: any = null
+
+      // First, try to find conversation by session_id (more reliable)
+      if (sessionId) {
+        const { data: conversations, error: fetchError } = await supabaseAdmin()
+          .from('conversations')
+          .select('*')
+          .eq('id', sessionId)
+          .single()
+
+        if (fetchError) {
+          console.warn('Error fetching conversation by session_id:', fetchError)
+        } else if (conversations) {
+          conversation = conversations
+          console.log('Found conversation by session_id:', sessionId)
+        }
       }
 
-      if (!conversations || conversations.length === 0) {
-        console.warn('No matching conversation found for email:', email)
+      // Fall back to finding by email if session_id didn't work
+      if (!conversation) {
+        console.log('Falling back to email-based lookup for:', email)
+        const { data: conversations, error: fetchError } = await supabaseAdmin()
+          .from('conversations')
+          .select('*')
+          .eq('email', email)
+          .eq('is_completed', true)
+          .eq('meeting_scheduled', false)
+          .order('created_at', { ascending: false })
+          .limit(1)
+
+        if (fetchError) {
+          console.error('Error fetching conversation by email:', fetchError)
+          return new Response(
+            JSON.stringify({ error: 'Database error' }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+          )
+        }
+
+        if (conversations && conversations.length > 0) {
+          conversation = conversations[0]
+          console.log('Found conversation by email:', email)
+        }
+      }
+
+      if (!conversation) {
+        console.warn('No matching conversation found for session_id:', sessionId, 'or email:', email)
         // Still return 200 to acknowledge webhook receipt
         return new Response(
           JSON.stringify({ success: true, message: 'Webhook received but no matching conversation' }),
           { status: 200, headers: { 'Content-Type': 'application/json' } }
         )
       }
-
-      const conversation = conversations[0] as any
 
       // Update conversation with meeting details
       const { error: updateError } = await (supabaseAdmin() as any)

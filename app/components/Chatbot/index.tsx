@@ -17,6 +17,7 @@ export default function Chatbot() {
     isLoading,
     isTyping,
     handleClose: handleChatbotClose,
+    conversationId,
   } = useChatbot(isOpen)
 
   // Only render on client side to avoid hydration mismatch
@@ -46,6 +47,7 @@ export default function Chatbot() {
         handleSubmit={handleSubmit}
         isLoading={isLoading}
         isTyping={isTyping}
+        conversationId={conversationId}
       />
     </>
   )

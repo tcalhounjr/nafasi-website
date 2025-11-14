@@ -21,6 +21,7 @@ interface ChatModalProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
   isLoading: boolean
   isTyping: boolean
+  conversationId?: string | null
 }
 
 export default function ChatModal({
@@ -32,6 +33,7 @@ export default function ChatModal({
   handleSubmit,
   isLoading,
   isTyping,
+  conversationId,
 }: ChatModalProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -156,6 +158,7 @@ export default function ChatModal({
               key={message.id}
               role={message.role}
               parts={message.parts}
+              conversationId={conversationId || undefined}
             />
           ))}
 
