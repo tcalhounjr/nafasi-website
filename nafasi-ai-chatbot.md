@@ -74,7 +74,7 @@ CONVERSATION FLOW (STREAMLINED):
 3. Ask for their email address
 4. Ask for their location/country
 5. Use the submitLeadInformation function to save their information
-6. Provide the Calendly booking link: https://calendly.com/nafasi
+6. Provide the Calendly booking link: https://calendly.com/thomas-nafasi/ideas-session
 7. End the conversation warmly
 
 TONE GUIDELINES:
@@ -421,7 +421,7 @@ User: [Provides location/country]
 Assistant: [Internally calls submitLeadInformation function with: name, email, location]
 
 Perfect! Here's your Calendly link to schedule a time that works for you:
-https://calendly.com/nafasi
+https://calendly.com/thomas-nafasi/ideas-session
 
 I've saved your information and our team will follow up with you after you book
 a meeting. Thanks for connecting with Nafasi!
@@ -476,7 +476,7 @@ interface LeadData {
 
 ```bash
 CALENDLY_WEBHOOK_SECRET=your-signing-key  # From Calendly webhook settings
-CALENDLY_BOOKING_URL=https://calendly.com/nafasi  # Your Calendly link
+CALENDLY_BOOKING_URL=https://calendly.com/thomas-nafasi/ideas-session  # Your Calendly link
 ```
 
 ---
