@@ -262,7 +262,7 @@ export async function POST(req: Request) {
                         leadData: {
                           name: leadData.name,
                           email: leadData.email,
-                          location: leadData.location
+                          project_description: leadData.project_description
                         }
                       })}\n\n`))
 

@@ -37,7 +37,9 @@ export async function POST(req: Request) {
     const signature = headersList.get('X-Calendly-Signature') || ''
     const body = await req.json()
 
-    console.log('Calendly webhook received:', JSON.stringify(body, null, 2))
+    console.log('=== CALENDLY WEBHOOK RECEIVED ===')
+    console.log('Webhook body:', JSON.stringify(body, null, 2))
+    console.log('Event type:', body.event)
 
     // Verify webhook authenticity
     const payload = await req.text()
@@ -150,7 +152,10 @@ export async function POST(req: Request) {
       }
 
       if (!conversation) {
-        console.warn('No matching conversation found for meeting ID:', meetingIdAnswer, 'or email:', email)
+        console.warn('=== NO CONVERSATION FOUND ===')
+        console.warn('Meeting ID answer:', meetingIdAnswer)
+        console.warn('Email:', email)
+        console.warn('Found by meeting ID:', foundByMeetingId)
         // Still return 200 to acknowledge webhook receipt
         return new Response(
           JSON.stringify({ success: true, message: 'Webhook received but no matching conversation' }),
@@ -178,21 +183,30 @@ export async function POST(req: Request) {
       }
 
       // Send email notification now that meeting is confirmed
-      if (conversation.is_qualified) {
-        const emailResult = await sendLeadNotification({
-          name: conversation.name,
-          email: conversation.email,
-          project_description: conversation.project_description,
-          messages: conversation.messages,
-          calendlyLink: scheduling_url,
-        })
+      // Note: We send email for all meetings booked (already verified as human via Meeting ID entry)
+      console.log('=== SENDING EMAIL NOTIFICATION ===')
+      console.log('Conversation data:', {
+        id: conversation.id,
+        name: conversation.name,
+        email: conversation.email,
+        project_description: conversation.project_description,
+        has_messages: !!conversation.messages,
+      })
 
-        console.log('Lead notification email sent:', {
-          conversationId: conversation.id,
-          email: conversation.email,
-          success: emailResult.success,
-        })
-      }
+      const emailResult = await sendLeadNotification({
+        name: conversation.name,
+        email: conversation.email,
+        project_description: conversation.project_description,
+        messages: conversation.messages,
+        calendlyLink: scheduling_url,
+      })
+
+      console.log('=== EMAIL RESULT ===')
+      console.log('Lead notification email sent:', {
+        conversationId: conversation.id,
+        email: conversation.email,
+        success: emailResult.success,
+      })
 
       return new Response(
         JSON.stringify({
