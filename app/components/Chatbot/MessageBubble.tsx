@@ -33,6 +33,33 @@ export default function MessageBubble({ role, parts, timestamp }: MessageBubbleP
       .join('')
   }
 
+  // Parse text and convert URLs to clickable links
+  const renderTextWithLinks = () => {
+    const text = getTextContent()
+    const urlRegex = /(https?:\/\/[^\s]+)/g
+    const parts = text.split(urlRegex)
+
+    return parts.map((part, index) => {
+      if (urlRegex.test(part)) {
+        return (
+          <Text
+            key={index}
+            as="a"
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            textDecoration="underline"
+            _hover={{ opacity: 0.8 }}
+            display="inline"
+          >
+            {part}
+          </Text>
+        )
+      }
+      return <span key={index}>{part}</span>
+    })
+  }
+
   return (
     <Box
       display="flex"
@@ -57,7 +84,7 @@ export default function MessageBubble({ role, parts, timestamp }: MessageBubbleP
         boxShadow={isUser ? '0 2px 8px rgba(49, 178, 146, 0.3)' : 'none'}
       >
         <Text fontSize="sm" lineHeight="tall" whiteSpace="pre-wrap">
-          {getTextContent()}
+          {renderTextWithLinks()}
         </Text>
       </Box>
 
