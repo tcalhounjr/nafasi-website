@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/lib/utils/supabase'
 import { sendLeadNotification } from '@/lib/utils/send-notification'
 import { headers } from 'next/headers'
+import crypto from 'crypto'
 
 /**
  * Calendly Webhook Handler
@@ -14,12 +15,6 @@ import { headers } from 'next/headers'
 
 // Verify webhook signature (Calendly sends X-Calendly-Signature header)
 function verifyCalendlySignature(payload: string, signature: string): boolean {
-  // For now, we'll accept all webhooks. In production, implement signature verification:
-  // 1. Get your webhook secret from Calendly settings
-  // 2. Compute HMAC-SHA256(secret, payload)
-  // 3. Compare with signature header
-
-  // Placeholder - implement with your webhook secret
   const CALENDLY_WEBHOOK_SECRET = process.env.CALENDLY_WEBHOOK_SECRET || ''
 
   if (!CALENDLY_WEBHOOK_SECRET) {
@@ -27,8 +22,34 @@ function verifyCalendlySignature(payload: string, signature: string): boolean {
     return true
   }
 
-  // TODO: Implement proper signature verification
-  return true
+  if (!signature) {
+    console.error('No signature provided in webhook request')
+    return false
+  }
+
+  try {
+    // Compute HMAC-SHA256 signature
+    const hmac = crypto.createHmac('sha256', CALENDLY_WEBHOOK_SECRET)
+    hmac.update(payload)
+    const computedSignature = hmac.digest('base64')
+
+    // Compare signatures (constant-time comparison to prevent timing attacks)
+    const isValid = crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(computedSignature)
+    )
+
+    if (!isValid) {
+      console.error('Webhook signature verification failed')
+      console.error('Received:', signature.substring(0, 20) + '...')
+      console.error('Expected:', computedSignature.substring(0, 20) + '...')
+    }
+
+    return isValid
+  } catch (error) {
+    console.error('Error verifying webhook signature:', error)
+    return false
+  }
 }
 
 export async function POST(req: Request) {
@@ -45,10 +66,9 @@ export async function POST(req: Request) {
     console.log('Event type:', body.event)
 
     // Verify webhook authenticity
-    // Note: This is a simplified check - implement proper verification in production
-    // if (!verifyCalendlySignature(bodyText, signature)) {
-    //   return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401 })
-    // }
+    if (!verifyCalendlySignature(bodyText, signature)) {
+      return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401 })
+    }
 
     // Handle invitee.created event (meeting scheduled)
     if (body.event === 'invitee.created') {

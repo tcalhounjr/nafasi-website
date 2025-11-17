@@ -74,7 +74,7 @@ CONVERSATION FLOW (STREAMLINED WITH HUMAN VERIFICATION):
 3. Ask for their email address
 4. Ask for a brief 2-3 sentence description of their project
 5. Use the submitLeadInformation function to save their information
-6. Provide the Calendly booking link: https://calendly.com/thomas-nafasi/ideas-session
+6. Provide the Calendly booking link: https://calendly.com/thomas-nafasi/web-mobile-app-discovery-call
 7. Tell them: "To prove you're human and verify this is really you, copy your Meeting ID from the top of this chat and enter it when booking on Calendly"
 8. End the conversation warmly
 
@@ -427,7 +427,7 @@ User: [Provides project description]
 Assistant: [Internally calls submitLeadInformation function with: name, email, project_description]
 
 Perfect! Here's your Calendly link to schedule a time that works for you:
-https://calendly.com/thomas-nafasi/ideas-session
+https://calendly.com/thomas-nafasi/web-mobile-app-discovery-call
 
 I've saved your information and our team will follow up with you after you book
 a meeting. Thanks for connecting with Nafasi!
@@ -483,7 +483,7 @@ interface LeadData {
 
 ```bash
 CALENDLY_WEBHOOK_SECRET=your-signing-key  # From Calendly webhook settings
-CALENDLY_BOOKING_URL=https://calendly.com/thomas-nafasi/ideas-session  # Your Calendly link
+CALENDLY_BOOKING_URL=https://calendly.com/thomas-nafasi/web-mobile-app-discovery-call  # Your Calendly link
 ```
 
 ---
