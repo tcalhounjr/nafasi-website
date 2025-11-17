@@ -35,16 +35,18 @@ export async function POST(req: Request) {
   try {
     const headersList = await headers()
     const signature = headersList.get('X-Calendly-Signature') || ''
-    const body = await req.json()
+
+    // Read the raw body text first (needed for signature verification)
+    const bodyText = await req.text()
+    const body = JSON.parse(bodyText)
 
     console.log('=== CALENDLY WEBHOOK RECEIVED ===')
     console.log('Webhook body:', JSON.stringify(body, null, 2))
     console.log('Event type:', body.event)
 
     // Verify webhook authenticity
-    const payload = await req.text()
     // Note: This is a simplified check - implement proper verification in production
-    // if (!verifyCalendlySignature(payload, signature)) {
+    // if (!verifyCalendlySignature(bodyText, signature)) {
     //   return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401 })
     // }
 
