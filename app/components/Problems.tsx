@@ -10,17 +10,17 @@ export default function Problems() {
 
   const problems = [
     {
-      image: '/afrofuturistic-trading.png',
+      image: '/problems/afrofuturistic-trading.png',
       title: 'Roughly 67% of African Americans do not Own Stocks',
       description: 'The capital markets might be the greatest wealth creation tool known to man. We are building a platform to significantly increase market participation in this group.',
     },
     {
-      image: '/afrofuturistic-business-district.png',
+      image: '/problems/afrofuturistic-business-district.png',
       title: 'Successful Black Founders Struggle to Exit Gracefully',
       description: 'Regardless of gender or orientation, less than 1% of Black founders raise venture funding as a startup. And, even if they do bootstrap their way to success, exiting gracefully is equally difficult.',
     },
     {
-      image: '/afrofuturesitc-bank-lobby.png',
+      image: '/problems/afrofuturesitc-bank-lobby.png',
       title: 'Minority Businesses Lose Access to $70M in Grant and Program Funding',
       description: 'CDFIs rely on the MBDA for programming and access to grants in support of unerrepresented business owners. It is incumbent upon constituents of the surrounding communities CDFIs serve to replace said funding.',
     },
@@ -74,7 +74,7 @@ export default function Problems() {
         h="100%"
         opacity={0.03}
         style={{
-          backgroundImage: "url('/nasa-star-burst-bw-hero.jpg')",
+          backgroundImage: "url('/hero/nasa-star-burst-bw-hero.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -117,7 +117,7 @@ export default function Problems() {
             lineHeight="tall"
             textShadow="0 2px 4px rgba(0, 0, 0, 0.8)"
           >
-            Ensuring marginalized communities are thriving by creating equitable access to opportunities is more than a mission; it's a foundational part of Nafasi's human-centered corporate ethos
+            We are absolutely obsessed with addressing marginalized communities' most pressing challenges with modern, profitable, AI-driven technology solutions
           </Text>
         </VStack>
 
@@ -315,7 +315,7 @@ export default function Problems() {
                   display: 'block',
                 }}
               >
-                <source src="/problems-were-solving-3.mp4" type="video/mp4" />
+                <source src="/problems/problems-were-solving-3.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </Box>

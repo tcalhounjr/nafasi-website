@@ -33,7 +33,7 @@ export default function Experience() {
         h="100%"
         opacity={0.03}
         style={{
-          backgroundImage: "url('/nasa-star-burst-bw-hero.jpg')",
+          backgroundImage: "url('/hero/nasa-star-burst-bw-hero.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -76,7 +76,7 @@ export default function Experience() {
               lineHeight="tall"
               textShadow="0 2px 4px rgba(0, 0, 0, 0.8)"
             >
-              Working with leading public and private organizations delivering holistic, mission-critical solutions. We specialize in connecting organizational strategy to the people, processes, and technology expected to execute it.
+              Our extensive experience working with public and private organizations is what gives our clients peace of mind. We specialize in connecting organizational strategy to the people, processes, and technology expected to execute it.
             </Text>
           </VStack>
 

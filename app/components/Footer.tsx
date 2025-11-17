@@ -99,7 +99,7 @@ export default function Footer() {
                 color="gray.300"
                 maxW="2xl"
               >
-                Ready to transform your vision into reality? Let&apos;s start a conversation about how we can engineer equity together.
+                Don't let failure to launch keep your ideas grounded. Let&apos;s venture beyond ideas on a journey to infinite opportunities together!
               </Text>
               <Button
                 size="lg"
@@ -136,9 +136,23 @@ export default function Footer() {
                 onClick={(e) => scrollToSection(e, link.href)}
                 fontSize="md"
                 color="gray.400"
+                position="relative"
                 _hover={{
                   color: 'nafasi.green',
                   textDecoration: 'none',
+                  _after: {
+                    width: '100%',
+                  },
+                }}
+                _after={{
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-4px',
+                  left: 0,
+                  width: '0%',
+                  height: '2px',
+                  bg: 'nafasi.green',
+                  transition: 'width 0.3s ease',
                 }}
                 transition="color 0.2s"
               >

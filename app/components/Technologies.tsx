@@ -7,6 +7,7 @@ export default function Technologies() {
     { src: '/tech-stack/html5.svg', alt: 'HTML5' },
     { src: '/tech-stack/css3.svg', alt: 'CSS3' },
     { src: '/tech-stack/javascript.svg', alt: 'JavaScript' },
+    { src: '/tech-stack/typescript.svg', alt: 'TypeScript' },
     { src: '/tech-stack/nodejs.svg', alt: 'Node.js' },
     { src: '/tech-stack/nextjs.svg', alt: 'Next.js' },
     { src: '/tech-stack/react.svg', alt: 'React' },
@@ -49,7 +50,7 @@ export default function Technologies() {
         h="100%"
         opacity={0.03}
         style={{
-          backgroundImage: "url('/nasa-star-burst-bw-hero.jpg')",
+          backgroundImage: "url('/hero/nasa-star-burst-bw-hero.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -92,7 +93,7 @@ export default function Technologies() {
               lineHeight="tall"
               textShadow="0 2px 4px rgba(0, 0, 0, 0.8)"
             >
-              Leveraging cutting-edge technologies to build scalable, performant, and modern solutions. From frontend to backend, we use industry-leading tools to deliver exceptional results.
+              Our clients expect and deserve the best. We exceed that expectation by deploying industry-leading technologies to deliver exceptional results.
             </Text>
           </VStack>
 
@@ -149,84 +150,84 @@ export default function Technologies() {
             >
               {/* First set of logos */}
               {logos.map((logo, index) => (
-                  <Box
-                    key={`logo-1-${index}`}
-                    title={logo.alt}
-                    flexShrink={0}
-                    width="180px"
-                    height="180px"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    padding="1.5rem"
-                    border="1px solid"
-                    borderColor="rgba(49, 178, 146, 0.2)"
-                    borderRadius="md"
-                    bg="rgba(255, 255, 255, 0.02)"
-                    transition="all 0.3s ease"
-                    _hover={{
-                      borderColor: '#31b292',
-                      bg: 'rgba(49, 178, 146, 0.05)',
-                      transform: 'scale(1.05)',
+                <Box
+                  key={`logo-1-${index}`}
+                  title={logo.alt}
+                  flexShrink={0}
+                  width="180px"
+                  height="180px"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  padding="1.5rem"
+                  border="1px solid"
+                  borderColor="rgba(49, 178, 146, 0.2)"
+                  borderRadius="md"
+                  bg="rgba(255, 255, 255, 0.02)"
+                  transition="all 0.3s ease"
+                  _hover={{
+                    borderColor: '#31b292',
+                    bg: 'rgba(49, 178, 146, 0.05)',
+                    transform: 'scale(1.05)',
+                  }}
+                  className="technologies-logo-container"
+                >
+                  <img
+                    src={logo.src}
+                    alt={logo.alt}
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      width: 'auto',
+                      height: 'auto',
+                      objectFit: 'contain',
+                      filter: 'invert(1)',
+                      transition: 'filter 0.3s ease',
                     }}
-                    className="technologies-logo-container"
-                  >
-                    <img
-                      src={logo.src}
-                      alt={logo.alt}
-                      style={{
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        width: 'auto',
-                        height: 'auto',
-                        objectFit: 'contain',
-                        filter: 'invert(1)',
-                        transition: 'filter 0.3s ease',
-                      }}
-                      className="technologies-logo-image"
-                    />
-                  </Box>
+                    className="technologies-logo-image"
+                  />
+                </Box>
               ))}
 
               {/* Duplicate set to fill space during animation */}
               {logos.map((logo, index) => (
-                  <Box
-                    key={`logo-2-${index}`}
-                    title={logo.alt}
-                    flexShrink={0}
-                    width="180px"
-                    height="180px"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    padding="1.5rem"
-                    border="1px solid"
-                    borderColor="rgba(49, 178, 146, 0.2)"
-                    borderRadius="md"
-                    bg="rgba(255, 255, 255, 0.02)"
-                    transition="all 0.3s ease"
-                    _hover={{
-                      borderColor: '#31b292',
-                      bg: 'rgba(49, 178, 146, 0.05)',
-                      transform: 'scale(1.05)',
+                <Box
+                  key={`logo-2-${index}`}
+                  title={logo.alt}
+                  flexShrink={0}
+                  width="180px"
+                  height="180px"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  padding="1.5rem"
+                  border="1px solid"
+                  borderColor="rgba(49, 178, 146, 0.2)"
+                  borderRadius="md"
+                  bg="rgba(255, 255, 255, 0.02)"
+                  transition="all 0.3s ease"
+                  _hover={{
+                    borderColor: '#31b292',
+                    bg: 'rgba(49, 178, 146, 0.05)',
+                    transform: 'scale(1.05)',
+                  }}
+                  className="technologies-logo-container"
+                >
+                  <img
+                    src={logo.src}
+                    alt={logo.alt}
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      width: 'auto',
+                      height: 'auto',
+                      objectFit: 'contain',
+                      filter: 'invert(1)',
+                      transition: 'filter 0.3s ease',
                     }}
-                    className="technologies-logo-container"
-                  >
-                    <img
-                      src={logo.src}
-                      alt={logo.alt}
-                      style={{
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        width: 'auto',
-                        height: 'auto',
-                        objectFit: 'contain',
-                        filter: 'invert(1)',
-                        transition: 'filter 0.3s ease',
-                      }}
-                      className="technologies-logo-image"
-                    />
-                  </Box>
+                    className="technologies-logo-image"
+                  />
+                </Box>
               ))}
             </div>
           </Box>
@@ -240,7 +241,7 @@ export default function Technologies() {
             transform: translateX(0);
           }
           to {
-            transform: translateX(calc(-180px * 25 - 3rem * 25));
+            transform: translateX(calc(-180px * 26 - 3rem * 26));
           }
         }
       `}</style>
