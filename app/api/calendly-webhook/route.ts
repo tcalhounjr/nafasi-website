@@ -13,8 +13,8 @@ import crypto from 'crypto'
  * Events to subscribe to: invitee.created
  */
 
-// Verify webhook signature (Calendly sends X-Calendly-Signature header)
-function verifyCalendlySignature(payload: string, signature: string): boolean {
+// Verify webhook signature (Calendly sends Calendly-Webhook-Signature header)
+function verifyCalendlySignature(payload: string, signatureHeader: string): boolean {
   const CALENDLY_WEBHOOK_SECRET = process.env.CALENDLY_WEBHOOK_SECRET || ''
 
   if (!CALENDLY_WEBHOOK_SECRET) {
@@ -22,30 +22,56 @@ function verifyCalendlySignature(payload: string, signature: string): boolean {
     return true
   }
 
-  if (!signature) {
+  if (!signatureHeader) {
     console.error('No signature provided in webhook request')
     return false
   }
 
   try {
-    // Compute HMAC-SHA256 signature
-    const hmac = crypto.createHmac('sha256', CALENDLY_WEBHOOK_SECRET)
-    hmac.update(payload)
-    const computedSignature = hmac.digest('base64')
+    // Parse the signature header: "t=<timestamp>,v1=<signature>"
+    const { t, signature } = signatureHeader.split(',').reduce((acc: { t: string; signature: string }, currentValue) => {
+      const [key, value] = currentValue.split('=')
+      if (key === 't') {
+        acc.t = value
+      }
+      if (key === 'v1') {
+        acc.signature = value
+      }
+      return acc
+    }, { t: '', signature: '' })
+
+    if (!t || !signature) {
+      console.error('Invalid signature header format')
+      return false
+    }
+
+    // Create signed payload: timestamp + '.' + JSON payload
+    const data = t + '.' + payload
+    const expectedSignature = crypto.createHmac('sha256', CALENDLY_WEBHOOK_SECRET).update(data, 'utf8').digest('hex')
 
     // Compare signatures (constant-time comparison to prevent timing attacks)
     const isValid = crypto.timingSafeEqual(
       Buffer.from(signature),
-      Buffer.from(computedSignature)
+      Buffer.from(expectedSignature)
     )
 
     if (!isValid) {
       console.error('Webhook signature verification failed')
       console.error('Received:', signature.substring(0, 20) + '...')
-      console.error('Expected:', computedSignature.substring(0, 20) + '...')
+      console.error('Expected:', expectedSignature.substring(0, 20) + '...')
+      return false
     }
 
-    return isValid
+    // Prevent replay attacks - reject timestamps older than 3 minutes
+    const threeMinutes = 180000
+    const timestampMilliseconds = Number(t) * 1000
+
+    if (timestampMilliseconds < Date.now() - threeMinutes) {
+      console.error('Webhook signature timestamp is outside tolerance zone')
+      return false
+    }
+
+    return true
   } catch (error) {
     console.error('Error verifying webhook signature:', error)
     return false
@@ -55,7 +81,7 @@ function verifyCalendlySignature(payload: string, signature: string): boolean {
 export async function POST(req: Request) {
   try {
     const headersList = await headers()
-    const signature = headersList.get('X-Calendly-Signature') || ''
+    const signature = headersList.get('Calendly-Webhook-Signature') || ''
 
     // Read the raw body text first (needed for signature verification)
     const bodyText = await req.text()
