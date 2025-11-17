@@ -108,7 +108,7 @@ export default function ValueProps() {
         h="100%"
         opacity={0.03}
         style={{
-          backgroundImage: "url('/nasa-star-burst-bw-hero.jpg')",
+          backgroundImage: "url('/hero/nasa-star-burst-bw-hero.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -151,8 +151,7 @@ export default function ValueProps() {
               lineHeight="tall"
               textShadow="0 2px 4px rgba(0, 0, 0, 0.8)"
             >
-              We combine technical excellence with a commitment to equity, delivering solutions that
-              are as empowering as they are transformative.
+              As a fractional CTO, we offer clients peace of mind and the freedom to envision a world transformed by their business while we execute on said vision.
             </Text>
           </VStack>
 

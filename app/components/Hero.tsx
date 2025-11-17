@@ -26,7 +26,7 @@ export default function Hero() {
         opacity={0.4}
         zIndex={0}
         style={{
-          backgroundImage: "url('/nasa-star-burst-bw-hero.jpg')",
+          backgroundImage: "url('/hero/nasa-star-burst-bw-hero.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -100,7 +100,7 @@ export default function Hero() {
             px={{ base: 4, md: 0 }}
             textShadow="0 2px 8px rgba(0, 0, 0, 0.9)"
           >
-            Delivering AI-driven Technology Solutions for SMBs and Marginalized Communities
+            Delivering AI-driven Technology Solutions for Non-technical Founders and Small Businesses
           </Text>
 
           {/* CTA Button */}

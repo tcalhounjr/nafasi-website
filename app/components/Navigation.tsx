@@ -128,8 +128,8 @@ export default function Navigation() {
             left={0}
             right={0}
             bottom={0}
-            bg="rgba(0, 0, 0, 0.7)"
-            zIndex={999}
+            bg="rgba(0, 0, 0, 0.8)"
+            zIndex={9998}
             onClick={onClose}
           />
 
@@ -140,11 +140,13 @@ export default function Navigation() {
             right={0}
             bottom={0}
             width="280px"
-            bg="nafasi.black"
-            zIndex={1001}
-            borderLeft="1px solid"
-            borderColor="whiteAlpha.200"
+            bg="nafasi.menuBg"
+            zIndex={9999}
+            borderLeft="3px solid"
+            borderColor="nafasi.green"
+            boxShadow="0 0 60px rgba(49, 178, 146, 0.4), -20px 0 40px rgba(0, 0, 0, 0.8)"
             p={6}
+            overflowY="auto"
           >
             {/* Close Button */}
             <Flex justifyContent="space-between" alignItems="center" mb={8}>
@@ -169,20 +171,25 @@ export default function Navigation() {
             </Flex>
 
             {/* Navigation Links */}
-            <VStack gap={6} alignItems="flex-start">
+            <VStack gap={6} alignItems="flex-start" width="100%">
               {navigationLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
                   onClick={(e) => scrollToSection(e, link.href)}
-                  fontSize="lg"
-                  fontWeight="medium"
-                  color="gray.300"
-                  _hover={{
+                  fontSize="xl"
+                  fontWeight="semibold"
+                  color="white"
+                  width="100%"
+                  py={3}
+                  px={2}
+                  borderBottom="1px solid"
+                  borderColor="whiteAlpha.200"
+                  _active={{
                     color: 'nafasi.green',
-                    textDecoration: 'none',
+                    borderColor: 'nafasi.green',
                   }}
-                  transition="color 0.2s"
+                  transition="all 0.2s"
                 >
                   {link.name}
                 </Link>

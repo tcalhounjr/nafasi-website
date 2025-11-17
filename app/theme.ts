@@ -10,6 +10,7 @@ const config = defineConfig({
           greenLight: { value: '#4dd4ae' },
           greenDark: { value: '#228d70' },
           black: { value: '#0a0a0a' },
+          menuBg: { value: '#0a0a0a' },
           cosmicBlue: { value: '#1a4d7a' },
           cosmicBlueDark: { value: '#0d2d47' },
           white: { value: '#ffffff' },

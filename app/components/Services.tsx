@@ -108,7 +108,7 @@ export default function Services() {
         h="100%"
         opacity={0.03}
         style={{
-          backgroundImage: "url('/nasa-star-burst-bw-hero.jpg')",
+          backgroundImage: "url('/hero/nasa-star-burst-bw-hero.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -151,7 +151,7 @@ export default function Services() {
               lineHeight="tall"
               textShadow="0 2px 4px rgba(0, 0, 0, 0.8)"
             >
-              Comprehensive technology solutions designed to empower your business and accelerate growth through innovation and expertise.
+              We leverage technology to improve the processes that most significantly impact our clients, their employees, and their customers.
             </Text>
           </VStack>
 
