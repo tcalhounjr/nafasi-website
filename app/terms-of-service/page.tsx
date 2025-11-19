@@ -432,7 +432,7 @@ export default function TermsOfService() {
             <Text mb={2}>All notices, requests, and other communications required under these Terms should be sent to:</Text>
             <Text mb={2}><strong>Nafasi, Inc.</strong></Text>
             <Text mb={2}>Email: <ChakraLink href="mailto:admin@nafasi.co" color="nafasi.green">admin@nafasi.co</ChakraLink></Text>
-            <Text mb={4}>Website: <ChakraLink href="https://www.nafasi.co" color="nafasi.green" isExternal>https://www.nafasi.co</ChakraLink></Text>
+            <Text mb={4}>Website: <ChakraLink href="https://www.nafasi.co" color="nafasi.green" target="_blank" rel="noopener noreferrer">https://www.nafasi.co</ChakraLink></Text>
           </Box>
 
           {/* Section 15: Contact Information */}
@@ -441,7 +441,7 @@ export default function TermsOfService() {
             <Text mb={2}>For questions, concerns, or disputes regarding these Terms of Service, please contact:</Text>
             <Text mb={2}><strong>Nafasi, Inc.</strong></Text>
             <Text mb={2}>Email: <ChakraLink href="mailto:admin@nafasi.co" color="nafasi.green">admin@nafasi.co</ChakraLink></Text>
-            <Text mb={4}>Website: <ChakraLink href="https://www.nafasi.co" color="nafasi.green" isExternal>https://www.nafasi.co</ChakraLink></Text>
+            <Text mb={4}>Website: <ChakraLink href="https://www.nafasi.co" color="nafasi.green" target="_blank" rel="noopener noreferrer">https://www.nafasi.co</ChakraLink></Text>
             <Text mb={4}>We commit to responding to inquiries within 5-7 business days.</Text>
           </Box>
 

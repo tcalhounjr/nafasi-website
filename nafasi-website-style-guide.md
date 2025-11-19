@@ -607,11 +607,72 @@ conversations (
 ## Technical Implementation Notes
 
 ### Chakra UI v3 Compatibility
+
+#### Client-Side Rendering
+- **IMPORTANT:** All Chakra UI components must be client components (use `'use client'` directive)
+- Chakra's emotion CSS-in-JS requires client-side rendering to prevent hydration errors
+
+#### Stack Components (VStack, HStack, Stack)
+- **Breaking Change:** The `spacing` prop has been deprecated in favor of `gap`
+- Use `gap` for consistent spacing between stack children
+- Example:
+  ```tsx
+  // ❌ Old (v2 API - will cause build errors)
+  <VStack spacing={8} align="start">
+    {children}
+  </VStack>
+
+  // ✅ New (v3 API)
+  <VStack gap={8} align="start">
+    {children}
+  </VStack>
+  ```
+
+#### List Components
+- **Breaking Change:** `UnorderedList` and `ListItem` components are not exported in v3
+- Use `Box` component with `as` prop to create semantic HTML lists
+- Apply list styling via CSS or style props
+- Example:
+  ```tsx
+  // ✅ v3 List Implementation
+  <Box
+    as="ul"
+    mb={4}
+    pl={6}
+    css={{
+      listStyleType: "disc",
+      listStylePosition: "outside"
+    }}
+  >
+    <Box as="li" mb={1}>
+      First item
+    </Box>
+    <Box as="li" mb={1}>
+      Second item
+    </Box>
+  </Box>
+  ```
+
+#### Link Components
+- **Breaking Change:** The `isExternal` prop is not available on Chakra UI Link in v3
+- Use standard HTML attributes `target="_blank"` and `rel="noopener noreferrer"` for external links
+- Example:
+  ```tsx
+  // ❌ Old (v2 API - will cause build errors)
+  <ChakraLink href="https://example.com" isExternal>
+    External Link
+  </ChakraLink>
+
+  // ✅ New (v3 API)
+  <ChakraLink href="https://example.com" target="_blank" rel="noopener noreferrer">
+    External Link
+  </ChakraLink>
+  ```
+
+#### Background and Layout Props
 - Use `style` prop for `backgroundImage`, `backgroundSize`, `backgroundPosition`
 - Use Chakra props for layout: `position`, `w`, `h`, `opacity`, `zIndex`
 - Use `bgGradient` prop for gradients
-- **IMPORTANT:** All Chakra UI components must be client components (use `'use client'` directive)
-- Chakra's emotion CSS-in-JS requires client-side rendering to prevent hydration errors
 
 ### CSS Animations in Next.js
 - `@keyframes` defined in `globals.css` are **NOT** accessible to inline `style` props

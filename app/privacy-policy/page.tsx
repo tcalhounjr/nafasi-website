@@ -49,7 +49,7 @@ export default function PrivacyPolicy() {
             <Heading as="h3" size="md" mb={3}>2.2 Information Collected Automatically</Heading>
             <Text mb={2}><strong>Log Data:</strong> Our servers automatically record information about your interactions with the Website, including your IP address, browser type, operating system, referring URL, pages visited, time and date of access, and duration of visit.</Text>
             <Text mb={2}><strong>Cookies and Similar Technologies:</strong> We use cookies, web beacons, and similar tracking technologies to enhance user experience, remember your preferences, and analyze Website usage patterns. This includes:</Text>
-            <Box as="ul" mb={2} pl={6} styleType="disc">
+            <Box as="ul" mb={2} pl={6} css={{ listStyleType: "disc", listStylePosition: "outside" }}>
               <Box as="li" mb={1}><strong>Essential Cookies:</strong> Required for Website functionality</Box>
               <Box as="li" mb={1}><strong>Analytics Cookies:</strong> Used to understand how visitors interact with our Website</Box>
               <Box as="li" mb={1}><strong>Marketing Cookies:</strong> Used to track and display targeted advertisements</Box>
@@ -227,8 +227,8 @@ export default function PrivacyPolicy() {
             </Box>
             <Text mb={2}>You can control cookie preferences through your browser settings. To opt-out of specific tracking services, visit:</Text>
             <Box as="ul" mb={4} pl={6} css={{ listStyleType: "disc", listStylePosition: "outside" }}>
-              <Box as="li" mb={1}>Google Analytics: <ChakraLink href="https://tools.google.com/dlpage/gaoptout" color="nafasi.green" isExternal>https://tools.google.com/dlpage/gaoptout</ChakraLink></Box>
-              <Box as="li" mb={1}>Hotjar: <ChakraLink href="https://www.hotjar.com/legal/compliance/opt-out" color="nafasi.green" isExternal>https://www.hotjar.com/legal/compliance/opt-out</ChakraLink></Box>
+              <Box as="li" mb={1}>Google Analytics: <ChakraLink href="https://tools.google.com/dlpage/gaoptout" color="nafasi.green" target="_blank" rel="noopener noreferrer">https://tools.google.com/dlpage/gaoptout</ChakraLink></Box>
+              <Box as="li" mb={1}>Hotjar: <ChakraLink href="https://www.hotjar.com/legal/compliance/opt-out" color="nafasi.green" target="_blank" rel="noopener noreferrer">https://www.hotjar.com/legal/compliance/opt-out</ChakraLink></Box>
             </Box>
           </Box>
 
@@ -259,7 +259,7 @@ export default function PrivacyPolicy() {
             </Text>
             <Text mb={2}><strong>Nafasi, Inc.</strong></Text>
             <Text mb={2}>Email: <ChakraLink href="mailto:admin@nafasi.co" color="nafasi.green">admin@nafasi.co</ChakraLink></Text>
-            <Text mb={2}>Website: <ChakraLink href="https://www.nafasi.co" color="nafasi.green" isExternal>https://www.nafasi.co</ChakraLink></Text>
+            <Text mb={2}>Website: <ChakraLink href="https://www.nafasi.co" color="nafasi.green" target="_blank" rel="noopener noreferrer">https://www.nafasi.co</ChakraLink></Text>
             <Text mb={4}>
               We will respond to your inquiry within 30 days (or within 45 days for formal privacy rights requests under CCPA/GDPR).
             </Text>
