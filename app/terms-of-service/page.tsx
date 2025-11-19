@@ -7,7 +7,7 @@ export default function TermsOfService() {
   return (
     <Box minH="100vh" bg="gray.900" color="white" py={20}>
       <Container maxW="4xl">
-        <VStack align="start" spacing={8}>
+        <VStack align="start" gap={8}>
           {/* Header */}
           <Box>
             <ChakraLink as={Link} href="/" color="nafasi.green" _hover={{ textDecoration: 'underline' }}>
