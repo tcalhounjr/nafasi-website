@@ -198,7 +198,7 @@ export default function Footer() {
               </Text>
               <HStack gap={6}>
                 <Link
-                  href="#"
+                  href="/privacy-policy"
                   fontSize="sm"
                   color="gray.500"
                   _hover={{
@@ -209,7 +209,7 @@ export default function Footer() {
                   Privacy Policy
                 </Link>
                 <Link
-                  href="#"
+                  href="/terms-of-service"
                   fontSize="sm"
                   color="gray.500"
                   _hover={{
