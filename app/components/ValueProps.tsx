@@ -151,7 +151,7 @@ export default function ValueProps() {
               lineHeight="tall"
               textShadow="0 2px 4px rgba(0, 0, 0, 0.8)"
             >
-              As a fractional CTO, we offer clients peace of mind and the freedom to envision a world transformed by their business while we execute on said vision.
+              As your Digital Transformation team, we offer clients peace of mind and the freedom to envision a world transformed by their business while we execute on said vision.
             </Text>
           </VStack>
 
